@@ -73,3 +73,14 @@ public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbac
 public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool) {}
 public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool, int callbackIoProcesses, boolean logBeforeCodec, boolean logAfterCodec) {}
 }}}
+*Don't forget to call the init() method of the factory.*
+== Step 5: Create an asynchronous remote stub==
+{{{
+Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
+}}}
+== Step 6: Make an asynchronous remote call ==
+{{{
+hello.hello("gg", 25);
+}}}
+Please notice that it's an asynchronous call so the return value is always null if not 'void'. 
+When the response(return value) received from the server side, the HelloCallback will be invoked.
