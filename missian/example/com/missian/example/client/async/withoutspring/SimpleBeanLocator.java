@@ -32,7 +32,7 @@ public class SimpleBeanLocator implements BeanLocator {
 	@Override
 	public Object lookup(String beanName) {
 		if(beanName.equals("helloCallback")) {
-			return new HelloCallback(String.class);
+			return new HelloCallback();
 		}
 		throw new IllegalArgumentException("No bean was found:"+beanName);
 	}

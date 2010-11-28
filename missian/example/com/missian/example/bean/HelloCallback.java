@@ -27,8 +27,8 @@ package com.missian.example.bean;
 import com.missian.client.async.Callback;
 
 public class HelloCallback extends Callback{
-	public HelloCallback(Class<?> acceptValueType) {
-		super(acceptValueType);
+	public HelloCallback() {
+		super(String.class);
 	}
 
 	@Override

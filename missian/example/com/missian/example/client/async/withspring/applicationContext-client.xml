@@ -12,7 +12,6 @@
 
 	<!-- your callback bean, missian client will invoke its execute() method when received the returned object -->
 	<bean id="helloCallback" class="com.missian.example.bean.HelloCallback">
-		<constructor-arg value="java.lang.String"></constructor-arg>
 	</bean>
 
 </beans>
