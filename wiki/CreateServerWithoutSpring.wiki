@@ -7,7 +7,9 @@ Create a missian server without spring.
 
 = Details =
 
+== Implements a BeanLocator ==
 
+BeanLocator has only one implementation in missian: SpringLocator, but it does not work without spring, so we have to implement one, for example:
 {{{
 public class ExampleBeanLocator implements BeanLocator{
 
