@@ -125,3 +125,5 @@ And now configure this business implementation in spring:
 		new ClassPathXmlApplicationContext("com/missian/example/server/withspring/applicationContext-*.xml");
 	}
 }}}
+
+Now missian clients can call 'hello' bean.
