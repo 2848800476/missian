@@ -38,29 +38,14 @@ public interface Hello {
 }
 }}}
 
-==Step3: Implements a BeanLocator for missian to lookup callback beans ==
-BeanLocator has only one implementation(SpringLocator), and SpringLocator does not work without spring. So we have to implement one.
-{{{
-public class SimpleBeanLocator implements BeanLocator {
-
-	@Override
-	public Object lookup(String beanName) {
-		if(beanName.equals("helloCallback")) {
-			return new HelloCallback();
-		}
-		throw new IllegalArgumentException("No bean was found:"+beanName);
-	}
-
-}
-}}}
-
-==Step 4: Create the AsyncMissianProxyFactory ==
-{{{
-AsyncMissianProxyFactory factory = new AsyncMissianProxyFactory(TransportProtocol.tcp, new SimpleBeanLocator());
-factory.setHessian2Request(true);
-factory.setHessian2Response(true);
-//set anyother parameters here.
-factory.init();
+==Step 3: Configure the AsyncMissianProxyFactory in spring==
+{{{	
+	<bean id="asyncMissianProxyFactory" class="com.missian.client.async.AsyncMissianProxyFactory" init-method="init" destroy-method="destroy">
+		<constructor-arg value="tcp"/>
+		<constructor-arg >
+			<bean class="com.missian.common.beanlocate.SpringLocator"/>
+		</constructor-arg>
+	</bean>
 }}}
 We use this constructor:
 {{{
@@ -74,11 +59,35 @@ public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbac
 public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool, int callbackIoProcesses, boolean logBeforeCodec, boolean logAfterCodec) {}
 }}}
 *Don't forget to call the init() method of the factory.*
-== Step 5: Create an asynchronous remote stub==
+== Step 4: Configure the callback bean in spring==
+{{{
+	<bean id="helloCallback" class="com.missian.example.bean.HelloCallback">
+	</bean>
+}}}
+== Step 5: Get the asyncMissianProxyFactory bean ==
+   ===Get from the ApplicationContext===
+{{{AsyncMissianProxyFactory asyncMissianProxyFactory = (AsyncMissianProxyFactory)context.getBean("asyncMissianProxyFactory");
+}}} 
+   ===Inject by spring===
+{{{
+class ...{
+     private AsyncMissianProxyFactory asyncMissianProxyFactory;
+     public setAsyncMissianProxyFactory (AsyncMissianProxyFactory asyncMissianProxyFactory) {
+            this.asyncMissianProxyFactory = asyncMissianProxyFactory;
+     ..... 
+}
+}
+}}}
+{{{
+<bean id="..." class=".....">
+      <property name="asyncMissianProxyFactory" ref="asyncMissianProxyFactory">
+</bean>
+}}}
+== Step 6: Create an asynchronous remote stub==
 {{{
 Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
 }}}
-== Step 6: Make an asynchronous remote call ==
+== Step 7: Make an asynchronous remote call ==
 {{{
 hello.hello("gg", 25);
 }}}
