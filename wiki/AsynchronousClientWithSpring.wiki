@@ -76,11 +76,10 @@ class ...{
             this.asyncMissianProxyFactory = asyncMissianProxyFactory;
      ..... 
 }
-}
 }}}
 {{{
-<bean id="..." class=".....">
-      <property name="asyncMissianProxyFactory" ref="asyncMissianProxyFactory">
+<bean id="xxx" class="xxx">
+      <property name="asyncMissianProxyFactory" ref="asyncMissianProxyFactory"/>
 </bean>
 }}}
 == Step 6: Create an asynchronous remote stub==
