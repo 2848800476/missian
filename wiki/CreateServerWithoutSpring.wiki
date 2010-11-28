@@ -7,6 +7,20 @@ Create a missian server without spring.
 
 = Details =
 
+
+{{{
+public class ExampleBeanLocator implements BeanLocator{
+
+	@Override
+	public Object lookup(String beanName) {
+		if(beanName.equals("hello")) {
+			return new HelloImpl();
+		}
+		throw new IllegalArgumentException("No bean was found:"+beanName);
+	}
+
+}
+}}}
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
