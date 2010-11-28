@@ -66,7 +66,8 @@ Create missian server with spring
 	</bean>
 }}}
 Please node that we create an SpringLocator instance and inject it to the MissianHandler, so that the handler can lookup beans in the spring context.
-SpringLocator's source code:
+
+SpringLocator is provided by missian and its source code as below:
 {{{
 public class SpringLocator implements BeanLocator, ApplicationContextAware {
 	private ApplicationContext applicationContext;
