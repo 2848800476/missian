@@ -1,0 +1,62 @@
+Create an asynchronous client stub and make an asynchronous remote call.
+
+= Introduction =
+
+Create an asynchronous client stub and make an asynchronous remote call.
+
+
+= Details =
+
+==Step 1:Create a Callback class ==
+An asynchronous call requires a callback class which extends from Callback:
+{{{
+public class HelloCallback extends Callback{
+	public HelloCallback() {
+		super(String.class);
+	}
+
+	@Override
+	public void call(Object obj) {
+		System.out.println(obj);
+	}
+}
+}}}
+
+
+==Step 2: Use CallbackTarget annotation to annotate the interface method ==
+The Hello interface looks like this for an synchronous call:
+{{{
+public interface Hello {
+	public String hello(String name, int age);
+}
+}}}
+But for an asynchronous call:
+{{{
+public interface Hello {
+	@CallbackTarget("helloCallback")
+	public String hello(String name, int age);
+}
+}}}
+
+==Step3: Implements a BeanLocator for missian to lookup callback beans ==
+BeanLocator has only one implementation(SpringLocator), and SpringLocator does not work without spring. So we have to implement one.
+{{{
+public class SimpleBeanLocator implements BeanLocator {
+
+	@Override
+	public Object lookup(String beanName) {
+		if(beanName.equals("helloCallback")) {
+			return new HelloCallback();
+		}
+		throw new IllegalArgumentException("No bean was found:"+beanName);
+	}
+
+}
+}}}
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
+http://code.google.com/p/missian/
+missian
+Synchronous / asynchronous 
