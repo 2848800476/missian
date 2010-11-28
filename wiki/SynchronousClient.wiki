@@ -45,7 +45,7 @@ Please notice the url string:
  * 1235 is the server port *
  * hello is the beanName configured in the server side spring context.*
 
-== Make a remote call.
+== Make a remote call.==
 {{{
 String returnObj = hello.hello("hy", 27);
 }}}
