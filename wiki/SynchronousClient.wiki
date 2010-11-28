@@ -19,7 +19,7 @@ Here is an example:
 
 You notice that the SyncMissianProxyFactory accept only one contruct argument: TransportProtocol. TransportProtocol.tcp is the only implemented one, and I'm planning to implement TransportProtocol.http.
 
-With this constructor, all the socket will not be keep-alive, and will be closed when the response is received. If you want the socket's keepAlive, another constructor is useful:
+With this constructor, all the socket will be closed when the response is received. If you want the socket keeping alive, please use another constructor:
 {{{
 public SyncMissianProxyFactory(TransportProtocol transport, SocketPool socketPool){}
 }}}
