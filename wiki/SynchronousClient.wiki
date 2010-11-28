@@ -32,3 +32,6 @@ One accept one SyncMissianProxyFactory argument, and the pool parameters will be
 public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory){}
 }}}
 One accept one more argument:GenericKeyedObjectPool.Config. You can set configure as you want.
+{{{
+public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory, GenericKeyedObjectPool.Config config){}
+}}}
