@@ -15,7 +15,15 @@ Create missian server with spring
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 </beans>
 }}}
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+== Step 1:Create a custom editors to convert a 'host:port' string to SocketAddress ==
+{{{
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.net.SocketAddress">
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+}}}
