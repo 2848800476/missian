@@ -85,27 +85,43 @@ public class SpringLocator implements BeanLocator, ApplicationContextAware {
 }
 }}}
 
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
+== Step 6: Mina NioSocketAcceptor ==
 {{{
-
+	<bean id="minaAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor"
+		init-method="bind" destroy-method="unbind">
+		<property name="defaultLocalAddress" value=":1235" /><!---->
+		<property name="handler" ref="minaHandler" />
+		<property name="reuseAddress" value="true" />
+		<property name="filterChainBuilder" ref="filterChainBuilder" />
+	</bean>
 }}}
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
+== Step 7:Create business beans ==
+Create an interface， for example：
 {{{
-
+public interface Hello {
+	public String hello(String name, int age);
+}
 }}}
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
-{{{
 
+Implements the business interface
+{{{
+public class HelloImpl implements Hello {
+
+	@Override
+	public String hello(String name, int age) {
+		return "hi, "+name+", "+age;
+	}
+
+}
 }}}
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
-{{{
 
+And now configure this business implementation in spring:
+{{{
+<bean id="hello" class="com.missian.example.bean.HelloImpl"></bean>
 }}}
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
+== Step 8:Startup the server ==
 {{{
-
-}}}
-== Step 3:Create a custom editors to convert a 'host:port' string to SocketAddress ==
-{{{
-
+	public static void main(String[] args) {
+		new ClassPathXmlApplicationContext("com/missian/example/server/withspring/applicationContext-*.xml");
+	}
 }}}
