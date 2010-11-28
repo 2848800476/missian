@@ -31,11 +31,9 @@ import com.missian.client.TransportProtocol;
 import com.missian.client.async.AsyncMissianProxyFactory;
 import com.missian.example.bean.Hello;
 
+
 /**
- * @ClassName: AsyncClientTest
- * @Description: TODO(这里用一句话描述这个类的作用)
- * @author 丁胜瑜(dingshengyu@snda.com)
- * @date 2010-11-26 下午10:02:58
+ * description:
  *
  */
 public class AsyncClientExample {
