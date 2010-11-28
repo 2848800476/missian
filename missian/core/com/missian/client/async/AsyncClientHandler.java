@@ -22,7 +22,7 @@
  *   @author stanley
  *	 @date 2010-11-28
  */
-package com.missian.client.async.codec;
+package com.missian.client.async;
 
 import java.io.InputStream;
 
@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.HessianProtocolException;
-import com.missian.client.async.AsyncMissianProxyFactory;
-import com.missian.client.async.Callback;
 import com.missian.client.async.message.AsyncClientResponse;
 
 /**

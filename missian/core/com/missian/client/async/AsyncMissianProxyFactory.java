@@ -48,7 +48,6 @@ import com.missian.client.MissianProxyFactory;
 import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.client.async.codec.AsyncClientCodecFactory;
-import com.missian.client.async.codec.AsyncClientHandler;
 import com.missian.common.beanlocate.BeanLocator;
 import com.missian.common.util.Constants;
 
@@ -186,7 +185,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 * @param methodName
 	 * @return
 	 */
-	public Callback getCallBack(String beanName, String methodName) {
+	Callback getCallBack(String beanName, String methodName) {
 		Map<String, Callback> submap = callbackMap.get(beanName);
 		return submap == null ? null : submap.get(methodName);
 	}
@@ -197,7 +196,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 * @param methodName
 	 * @param callback
 	 */
-	public void setCallback(String beanName, String methodName, Callback callback) {
+	void setCallback(String beanName, String methodName, Callback callback) {
 		Map<String, Callback> submap = callbackMap.get(beanName);
 		if(submap==null) {
 			submap = new ConcurrentHashMap<String, Callback>();
@@ -250,7 +249,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 * @param port
 	 * @return
 	 */
-	public IoSession getIoSession(String host, int port) {
+	IoSession getIoSession(String host, int port) {
 		final String key = host +":" + port;
 		IoSession session = sessionMap.get(key);
 		if(session==null) {
