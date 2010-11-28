@@ -53,10 +53,23 @@ public class SimpleBeanLocator implements BeanLocator {
 
 }
 }}}
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
-http://code.google.com/p/missian/
-missian
-Synchronous / asynchronous 
+
+==Step 4: Create the AsyncMissianProxyFactory ==
+{{{
+AsyncMissianProxyFactory factory = new AsyncMissianProxyFactory(TransportProtocol.tcp, new SimpleBeanLocator());
+factory.setHessian2Request(true);
+factory.setHessian2Response(true);
+//set anyother parameters here.
+factory.init();
+}}}
+We use this constructor:
+{{{
+public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator)
+}}}
+It will create a thread pool with 4 threads for bussiness logic, and only one thread for I/O codec. If you want to change the thread numers, or pass an existing thread pool to it, please refer to the other constructors.
+{{{
+public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, int threadPoolSize){}
+public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, int threadPoolSize, int callbackIoProcesses, boolean logBeforeCodec, boolean logAfterCodec) {}
+public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool) {}
+public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool, int callbackIoProcesses, boolean logBeforeCodec, boolean logAfterCodec) {}
+}}}
