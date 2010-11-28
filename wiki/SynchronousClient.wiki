@@ -7,14 +7,13 @@ Create a synchronous client stub and make a synchronous call.
 
 = Details =
 
+== Create the SyncMissianProxyFactory ==
 Here is an example:
 {{{
 	public static void main(String[] args) throws IOException {
 		SyncMissianProxyFactory factory = new SyncMissianProxyFactory(TransportProtocol.tcp);
 		factory.setReadTimeout(100);
-		factory.setSocketPool(new CommonSocketPool(factory));
-		Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello", Thread.currentThread().getContextClassLoader());
-		System.out.println(hello.hello("hy", 27));
+		//set anyother parameters here, like sendBufferSize, tcpNoDelay...
 	}
 }}}
 
@@ -34,4 +33,19 @@ public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory){}
 One accept one more argument:GenericKeyedObjectPool.Config. You can set configure as you want.
 {{{
 public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory, GenericKeyedObjectPool.Config config){}
+}}}
+
+== Create the stub ==
+{{{
+Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
+}}}
+Please notice the url string:
+*Protocol=tcp
+*localhost is server host name
+*1235 is the server port
+*hello is the beanName configured in the server side spring context.
+
+== Make a remote call.
+{{{
+String returnObj = hello.hello("hy", 27);
 }}}
