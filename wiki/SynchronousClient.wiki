@@ -26,11 +26,11 @@ public SyncMissianProxyFactory(TransportProtocol transport, SocketPool socketPoo
 Yes, a SocketPool is required and missian provide a default implementation CommonSocketPool(based on apache commons-pool).
 
 CommonSocketPool has two constructor:
-Another constructor accept one SyncMissianProxyFactory argument, and the pool parameters will be default.
+One of the constructor accept one SyncMissianProxyFactory argument, and the pool parameters will be default.
 {{{
 public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory){}
 }}}
-One accept one more argument:GenericKeyedObjectPool.Config. You can set configure as you want.
+The other one accept one more argument:GenericKeyedObjectPool.Config. You can set configure as you want.
 {{{
 public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory, GenericKeyedObjectPool.Config config){}
 }}}
