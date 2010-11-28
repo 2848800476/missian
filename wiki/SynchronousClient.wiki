@@ -40,10 +40,10 @@ public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory, Generic
 Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
 }}}
 Please notice the url string:
-* tcp is transport
-* localhost is server host name
-* 1235 is the server port
-* hello is the beanName configured in the server side spring context.
+ * tcp is transport *
+ * localhost is server host name *
+ * 1235 is the server port *
+ * hello is the beanName configured in the server side spring context.*
 
 == Make a remote call.
 {{{
