@@ -66,7 +66,8 @@ public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbac
 }}}
 == Step 5: Get the asyncMissianProxyFactory bean ==
    ===Get from the ApplicationContext===
-{{{AsyncMissianProxyFactory asyncMissianProxyFactory = (AsyncMissianProxyFactory)context.getBean("asyncMissianProxyFactory");
+{{{
+AsyncMissianProxyFactory asyncMissianProxyFactory = (AsyncMissianProxyFactory)context.getBean("asyncMissianProxyFactory");
 }}} 
    ===Inject by spring===
 {{{
