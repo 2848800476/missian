@@ -24,16 +24,19 @@
  */
 package com.missian.common.io;
 
-/**
- * @ClassName: MissianMessage
- * @Description: TODO(这里用一句话描述这个类的作用)
- * @author 丁胜瑜(dingshengyu@snda.com)
- * @date 2010-11-26 下午05:32:56
- *
- */
+import com.missian.client.TransportProtocol;
+
+
 public class MissianMessage {
 	private String beanName;
+	private TransportProtocol transportProtocol;
 	
+	public TransportProtocol getTransportProtocol() {
+		return transportProtocol;
+	}
+	public void setTransportProtocol(TransportProtocol transportProtocol) {
+		this.transportProtocol = transportProtocol;
+	}
 	public String getBeanName() {
 		return beanName;
 	}

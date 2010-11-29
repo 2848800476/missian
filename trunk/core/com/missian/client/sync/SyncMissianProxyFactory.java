@@ -31,7 +31,6 @@ import java.net.Socket;
 
 import com.caucho.hessian.io.HessianRemoteObject;
 import com.missian.client.MissianProxyFactory;
-import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.client.sync.pool.SocketPool;
 
@@ -40,15 +39,12 @@ public class SyncMissianProxyFactory extends MissianProxyFactory{
 	private int readTimeout = 20;
 	private boolean connectionKeepAlive = false;
 	private SocketPool socketPool;
-	private TransportProtocol transport;
-	public SyncMissianProxyFactory(TransportProtocol transport) {
+	public SyncMissianProxyFactory() {
 		this.connectionKeepAlive = false;
-		this.transport = transport;
 	}
-	public SyncMissianProxyFactory(TransportProtocol transport, SocketPool socketPool) {
+	public SyncMissianProxyFactory(SocketPool socketPool) {
 		this.socketPool = socketPool;
 		connectionKeepAlive = true;
-		this.transport = transport;
 	}
 	
 	public void setSocketPool(SocketPool socketPool) {
@@ -71,9 +67,6 @@ public class SyncMissianProxyFactory extends MissianProxyFactory{
 					"api must not be null for HessianProxyFactory.create()");
 		InvocationHandler handler = null;
 		TransportURL u = new TransportURL(url);
-		if(u.getTransport()!=transport){
-			throw new IllegalArgumentException("Unacceptable protocol:"+u.getTransport());
-		}
 		handler = new SyncMissianProxy(u, this);
 
 		return Proxy.newProxyInstance(loader, new Class[] { api,

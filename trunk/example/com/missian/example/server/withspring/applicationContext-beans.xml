@@ -32,7 +32,7 @@
 		<property name="sessionCreatedLogLevel" value="DEBUG"/>
 		<property name="sessionClosedLogLevel" value="DEBUG"/>
 		<property name="sessionIdleLogLevel" value="DEBUG"/>
-		<property name="sessionOpenLogLevel" value="DEBUG"/>
+		<property name="sessionOpenedLogLevel" value="DEBUG"/>
 	</bean>
 	<!-- The non-SSL filter chain. -->
 	<bean id="filterChainBuilder"

@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="example"/>
 	<classpathentry kind="src" path="core"/>
+	<classpathentry kind="src" path="asyncweb_httpcodec"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="lib/hessian-4.0.7.jar" sourcepath="E:/资料及开源类库/hessian-4.0.7-src.jar"/>
-	<classpathentry kind="lib" path="lib/mina-core-2.0.1.jar" sourcepath="E:/资料及开源类库/mina/apache-mina-2.0.1-src/apache-mina-2.0.1/src/mina-core/src/main/java"/>
+	<classpathentry kind="lib" path="lib/hessian-4.0.7.jar" sourcepath="F:/hessian/hessian-4.0.7-src.jar"/>
+	<classpathentry kind="lib" path="lib/mina-core-2.0.1.jar" sourcepath="F:/mina/apache-mina-2.0.1-src/apache-mina-2.0.1/src/mina-core/src/main/java"/>
 	<classpathentry kind="lib" path="lib/org.springframework.core-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/org.springframework.context-3.0.5.RELEASE.jar" sourcepath="H:/Documents and Settings/stanley/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE-sources.jar"/>
