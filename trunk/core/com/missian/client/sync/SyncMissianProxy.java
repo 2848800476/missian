@@ -25,6 +25,7 @@
 package com.missian.client.sync;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -32,8 +33,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.WeakHashMap;
 
+import org.apache.mina.core.buffer.IoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +62,7 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 	private SyncMissianProxyFactory _factory;
 	private WeakHashMap<Method, String> _mangleMap = new WeakHashMap<Method, String>();
 	private TransportProtocol transportProtocol;
+	private CharsetDecoder charsetDecoder = Charset.forName(Constants.BEAN_NAME_CHARSET).newDecoder();
 	public SyncMissianProxy(TransportURL url,
 			SyncMissianProxyFactory syncMissianProxyFactory) {
 		super();
@@ -131,6 +136,11 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 
 			is = conn.getInputStream();
 			
+			if(transportProtocol==TransportProtocol.http) {
+				//to read http headers
+				while(!readLine(is).isEmpty());
+			}
+			
 			AbstractHessianInput in;
 
 			int code = is.read();
@@ -183,6 +193,37 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 				log.error(e.toString(), e);
 			}
 		}
+	}
+
+	/**
+	 * @param is 
+	 * @return
+	 * @throws IOException 
+	 */
+	private String readLine(InputStream is) throws IOException {
+		IoBuffer buffer = IoBuffer.allocate(30);
+		buffer.setAutoExpand(true);
+		while(true) {
+			byte b = (byte)is.read();
+			if(b==13) {
+				byte b2 = (byte)is.read();
+				if(b2!=10) {
+					throw new IOException("CR must be with a LR");
+				} else {
+					break;
+				}
+			} else {
+				buffer.put(b);
+			}
+		}
+		
+		buffer.flip();
+		if(!buffer.hasRemaining()) {
+			return "";
+		}
+		String line = buffer.getString(charsetDecoder);
+		charsetDecoder.reset();
+		return line;
 	}
 
 	private Socket sendRequest(String mangleName, Object[] args) throws Exception {
