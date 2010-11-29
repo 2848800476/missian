@@ -50,14 +50,12 @@ public abstract class MissianProxyFactory {
 	private int receiveBufferSize = 1024;
 
 	// hessian configurationso
-	private boolean hessian2Request;
-	private boolean hessian2Response;
-	private boolean overloadEnabled;
+	private boolean hessian2Request = true;
+	private boolean hessian2Response = true;
+	private boolean overloadEnabled = true;
 	public void setOverloadEnabled(boolean overloadEnabled) {
 		this.overloadEnabled = overloadEnabled;
-	}
-
-	
+	}	
 
 	public MissianProxyFactory() {
 		this(Thread.currentThread().getContextClassLoader());

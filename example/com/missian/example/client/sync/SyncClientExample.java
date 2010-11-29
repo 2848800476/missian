@@ -40,7 +40,7 @@ public class SyncClientExample {
 		SyncMissianProxyFactory factory = new SyncMissianProxyFactory();
 		factory.setReadTimeout(100);
 		factory.setSocketPool(new CommonSocketPool(factory));
-		Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello", Thread.currentThread().getContextClassLoader());
+		Hello hello = (Hello)factory.create(Hello.class, "http://localhost:8080/hessianTest/hessian", Thread.currentThread().getContextClassLoader());
 		System.out.println(hello.hello("hy", 27));
 	}
 
