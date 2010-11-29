@@ -71,7 +71,6 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 	 */
 	private static final long serialVersionUID = -1380891452634342681L;
 
-	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
 		String mangleName;

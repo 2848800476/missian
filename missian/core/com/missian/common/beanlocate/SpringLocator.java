@@ -30,12 +30,10 @@ import org.springframework.context.ApplicationContextAware;
 
 public class SpringLocator implements BeanLocator, ApplicationContextAware {
 	private ApplicationContext applicationContext;
-	@Override
 	public Object lookup(String beanName) {
 		return applicationContext.getBean(beanName);
 	}
 
-	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
 		this.applicationContext = applicationContext;

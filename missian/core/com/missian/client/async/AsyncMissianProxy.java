@@ -80,7 +80,6 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 	 */
 	private static final long serialVersionUID = -138089145263434181L;
 
-	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
 		CallbackTarget async = method.getAnnotation(CallbackTarget.class);

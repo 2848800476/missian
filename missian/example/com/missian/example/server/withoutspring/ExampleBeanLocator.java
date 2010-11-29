@@ -29,7 +29,6 @@ import com.missian.example.bean.HelloImpl;
 
 public class ExampleBeanLocator implements BeanLocator{
 
-	@Override
 	public Object lookup(String beanName) {
 		if(beanName.equals("hello")) {
 			return new HelloImpl();

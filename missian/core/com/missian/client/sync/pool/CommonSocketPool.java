@@ -50,12 +50,10 @@ public class CommonSocketPool implements SocketPool {
 	
 	
 	
-	@Override
 	public Socket getSocket(String host, int port) throws Exception {
 		return (Socket)pool.borrowObject(new ServerAddress(host, port));
 	}
 
-	@Override
 	public void returnSocket(String host, int port, Socket socket) throws Exception {
 		pool.returnObject(new ServerAddress(host, port), socket);
 	}

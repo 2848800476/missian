@@ -40,7 +40,6 @@ public class AsyncClientCodecFactory implements ProtocolCodecFactory {
 	/* (non-Javadoc)
 	 * @see org.apache.mina.filter.codec.ProtocolCodecFactory#getDecoder(org.apache.mina.core.session.IoSession)
 	 */
-	@Override
 	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
 		return new DecodingStateProtocolDecoder(new AsyncClientDecoderMachine());
 	}
@@ -48,7 +47,6 @@ public class AsyncClientCodecFactory implements ProtocolCodecFactory {
 	/* (non-Javadoc)
 	 * @see org.apache.mina.filter.codec.ProtocolCodecFactory#getEncoder(org.apache.mina.core.session.IoSession)
 	 */
-	@Override
 	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
 		return null;
 	}

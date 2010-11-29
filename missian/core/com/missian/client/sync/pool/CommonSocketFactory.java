@@ -37,29 +37,24 @@ public class CommonSocketFactory implements KeyedPoolableObjectFactory {
 		this.syncMissianProxyFactory = syncMissianProxyFactory;
 	}
 
-	@Override
 	public void activateObject(Object key, Object obj) throws Exception {
 		;
 	}
 
-	@Override
 	public void destroyObject(Object key, Object obj) throws Exception {
 		Socket socket = (Socket)obj;
 		socket.close();
 	}
 
-	@Override
 	public Object makeObject(Object key) throws Exception {
 		ServerAddress address = (ServerAddress)key;
 		return syncMissianProxyFactory.createSocket(address.getHost(), address.getPort());
 	}
 
-	@Override
 	public void passivateObject(Object key, Object obj) throws Exception {
 		;
 	}
 
-	@Override
 	public boolean validateObject(Object key, Object obj) {
 		Socket socket = (Socket)obj;
 		return socket.isConnected();

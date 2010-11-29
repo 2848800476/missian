@@ -27,7 +27,6 @@ package com.missian.example.bean;
 
 public class HelloImpl implements Hello {
 
-	@Override
 	public String hello(String name, int age) {
 		return "hi, "+name+", "+age;
 	}

@@ -32,12 +32,10 @@ import org.apache.mina.filter.codec.statemachine.DecodingStateProtocolDecoder;
 
 public class MissianCodecFactory implements ProtocolCodecFactory {
 
-	@Override
 	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
 		return new DecodingStateProtocolDecoder(new MissianDecoderMachine());
 	}
 
-	@Override
 	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
 		return new MissianEncoder();
 	}

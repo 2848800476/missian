@@ -34,13 +34,11 @@ import com.missian.common.util.Constants;
 
 public class MissianEncoder implements ProtocolEncoder {
 	
-	@Override
 	public void dispose(IoSession session) throws Exception {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void encode(IoSession session, Object message,
 			ProtocolEncoderOutput out) throws Exception {
 		IoBuffer buf = IoBuffer.allocate(Constants.INIT_BUF_SIZE);

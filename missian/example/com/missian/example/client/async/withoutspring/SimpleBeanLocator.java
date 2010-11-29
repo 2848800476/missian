@@ -29,7 +29,6 @@ import com.missian.example.bean.HelloCallback;
 
 public class SimpleBeanLocator implements BeanLocator {
 
-	@Override
 	public Object lookup(String beanName) {
 		if(beanName.equals("helloCallback")) {
 			return new HelloCallback();
