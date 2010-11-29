@@ -49,8 +49,9 @@ public class MissianEncoder implements ProtocolEncoder {
 			ProtocolEncoderOutput out) throws Exception {
 		MissianResponse resp = (MissianResponse)message;
 		if(resp.getTransportProtocol()==TransportProtocol.tcp) {
-			IoBuffer buf = IoBuffer.allocate(Constants.INIT_BUF_SIZE);
+			IoBuffer buf = IoBuffer.allocate(session.getConfig().getReadBufferSize());
 			buf.setAutoExpand(true);
+			buf.put((byte)(resp.isAsync() ? 1 : 0));//async or sync
 			if(resp.isAsync()) {
 				byte[] beanNameBytes = resp.getBeanName().getBytes(Constants.BEAN_NAME_CHARSET);
 				buf.putInt(beanNameBytes.length);

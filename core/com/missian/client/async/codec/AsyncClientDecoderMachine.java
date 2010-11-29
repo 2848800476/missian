@@ -29,6 +29,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.List;
 
+import org.apache.asyncweb.common.MutableHttpResponse;
+import org.apache.asyncweb.common.codec.HttpResponseDecodingState;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.statemachine.DecodingState;
@@ -57,19 +59,45 @@ public class AsyncClientDecoderMachine extends DecodingStateMachine {
 		if(childProducts.size()<3) {
 			return null;
 		}
-		AsyncClientResponse response = new AsyncClientResponse();
-		response.setBeanName((String)childProducts.get(0));
-		response.setMethodName((String)childProducts.get(1));
-		response.setInputStream((InputStream)childProducts.get(2));
-		out.write(response);
-		charsetDecoder.reset();
+		int childs = childProducts.size();
+		for(int i=0; i<childs; i=i+3) {
+			AsyncClientResponse response = new AsyncClientResponse();
+			response.setBeanName((String)childProducts.get(0));
+			response.setMethodName((String)childProducts.get(1));
+			response.setInputStream((InputStream)childProducts.get(2));
+			out.write(response);
+			charsetDecoder.reset();	
+		}
 		return null;
 	}
 
 	@Override
 	protected DecodingState init() throws Exception {
-		return beanNameState;
+		return checkTransportState;
 	}
+	
+	private DecodingState checkTransportState = new DecodingState() {
+
+		public DecodingState decode(IoBuffer in, ProtocolDecoderOutput out)
+				throws Exception {
+			if(in.hasRemaining()) {
+				byte b = in.get();
+				if(b!=0 && b!=1) {
+					in.position(in.position()-1);//HTTP-decoding-machine will decode this byte again
+					return httpDecodingState;
+				} else {
+					return beanNameState;
+				}
+			}
+			return this;
+		}
+
+		public DecodingState finishDecode(ProtocolDecoderOutput out)
+				throws Exception {
+			return null;
+		}
+		
+	};
 	
 	private DecodingState beanNameState = new IntegerDecodingState() {
 		
@@ -120,5 +148,24 @@ public class AsyncClientDecoderMachine extends DecodingStateMachine {
 				}
 			};
 		}
+	};
+	
+	private HttpResponseDecodingState httpDecodingState = new HttpResponseDecodingState() {
+
+		@Override
+		protected DecodingState finishDecode(List<Object> childProducts,
+				ProtocolDecoderOutput out) throws Exception {
+			for(Object child: childProducts) {
+				MutableHttpResponse response = (MutableHttpResponse)child;
+				String beanName = response.getHeader(Constants.HTTP_HEADER_BEANNAME);
+				String methodName = response.getHeader(Constants.HTTP_HEADER_METHOD);
+				IoBuffer content = response.getContent();
+				out.write(beanName);
+				out.write(methodName);
+				out.write(new IoBufferInputStream(content));
+			}
+			return null;
+		}
+		
 	};
 }

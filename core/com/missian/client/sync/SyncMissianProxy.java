@@ -35,9 +35,13 @@ import java.lang.reflect.Proxy;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.List;
 import java.util.WeakHashMap;
 
+import org.apache.asyncweb.common.codec.ChunkedBodyDecodingState;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.statemachine.DecodingState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +52,7 @@ import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.services.server.AbstractSkeleton;
 import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
+import com.missian.common.io.IoBufferInputStream;
 import com.missian.common.util.Constants;
 
 /**
@@ -110,7 +115,7 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 			else if (methodName.equals("getHessianType"))
 				return proxy.getClass().getInterfaces()[0].getName();
 			else if (methodName.equals("getHessianURL"))
-				return "sync://" + host + ":" + port + "/" + beanName;
+				return "tcp://" + host + ":" + port + "/" + beanName;
 			else if (methodName.equals("toString") && params.length == 0)
 				return toString();
 
@@ -136,13 +141,47 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 
 			is = conn.getInputStream();
 			
+			String line;
+			boolean chunked = false;
 			if(transportProtocol==TransportProtocol.http) {
 				//to read http headers
-				while(!readLine(is).isEmpty());
+				while(!(line=readLine(is)).isEmpty()){
+					if(line.startsWith("Transfer-Encoding:") && line.substring(line.indexOf(':')+1).trim().equals("chunked")){
+						chunked = true;
+					}
+				}
+			} else {
+				is.read();//int async = is.read(). it's useless for a sync call.
+			}
+			if(chunked) {
+				final IoBuffer buffer = IoBuffer.allocate(_factory.getReceiveBufferSize());
+				buffer.setAutoExpand(true);
+				ChunkedBodyDecodingState state = new ChunkedBodyDecodingState() {
+
+					@Override
+					protected DecodingState finishDecode(List<Object> children,
+							ProtocolDecoderOutput arg1) throws Exception {
+						for(Object child : children) {
+							buffer.put((IoBuffer)child);
+						}
+						buffer.flip();
+						return null;
+					}
+					
+				};
+				byte[] array = new byte[_factory.getReceiveBufferSize()];
+				int read;
+				while((read=is.read(array))>0) {
+					DecodingState decodingState = state.decode(IoBuffer.wrap(array, 0, read), null);
+					if(decodingState==null) {
+						break;
+					}
+				}
+				is = new IoBufferInputStream(buffer);
 			}
 			
 			AbstractHessianInput in;
-
+			
 			int code = is.read();
 
 			if (code == 'H') {

@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author The Apache MINA Project (dev@mina.apache.org)
  */
-abstract class HttpResponseDecodingState extends DecodingStateMachine {
+public abstract class HttpResponseDecodingState extends DecodingStateMachine {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(HttpResponseDecodingState.class);
