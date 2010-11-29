@@ -31,9 +31,20 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.statemachine.DecodingStateProtocolDecoder;
 
 public class MissianCodecFactory implements ProtocolCodecFactory {
-
+	
 	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-		return new DecodingStateProtocolDecoder(new MissianDecoderMachine());
+		ProtocolDecoder decoder = (ProtocolDecoder)session.getAttribute(ProtocolDecoder.class);
+		if(decoder!=null) {
+			return decoder;
+		}
+		synchronized (session) {
+			decoder = (ProtocolDecoder)session.getAttribute(ProtocolDecoder.class);
+			if(decoder==null) {
+				decoder = new DecodingStateProtocolDecoder(new MissianDecoderMachine());
+				session.setAttribute(ProtocolDecoder.class, decoder);
+			}			
+		}
+		return decoder;
 	}
 
 	public ProtocolEncoder getEncoder(IoSession session) throws Exception {

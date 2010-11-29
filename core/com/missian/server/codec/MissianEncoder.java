@@ -24,16 +24,22 @@
  */
 package com.missian.server.codec;
 
+import org.apache.asyncweb.common.DefaultHttpResponse;
+import org.apache.asyncweb.common.HttpHeaderConstants;
+import org.apache.asyncweb.common.HttpResponseStatus;
+import org.apache.asyncweb.common.HttpVersion;
+import org.apache.asyncweb.common.codec.HttpResponseEncoder;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
+import com.missian.client.TransportProtocol;
 import com.missian.common.util.Constants;
 
 
 public class MissianEncoder implements ProtocolEncoder {
-	
+	private HttpResponseEncoder httpResponseEncoder = new HttpResponseEncoder();
 	public void dispose(IoSession session) throws Exception {
 		// TODO Auto-generated method stub
 
@@ -41,21 +47,42 @@ public class MissianEncoder implements ProtocolEncoder {
 
 	public void encode(IoSession session, Object message,
 			ProtocolEncoderOutput out) throws Exception {
-		IoBuffer buf = IoBuffer.allocate(Constants.INIT_BUF_SIZE);
-		buf.setAutoExpand(true);
 		MissianResponse resp = (MissianResponse)message;
-		if(resp.isAsync()) {
-			byte[] beanNameBytes = resp.getBeanName().getBytes(Constants.BEAN_NAME_CHARSET);
-			buf.putInt(beanNameBytes.length);
-			buf.put(beanNameBytes);
-			byte[] methodNameBytes = resp.getMethodName().getBytes(Constants.BEAN_NAME_CHARSET);
-			buf.putInt(methodNameBytes.length);
-			buf.put(methodNameBytes);
-			buf.putInt(resp.getOutputBuffer().limit());
+		if(resp.getTransportProtocol()==TransportProtocol.tcp) {
+			IoBuffer buf = IoBuffer.allocate(Constants.INIT_BUF_SIZE);
+			buf.setAutoExpand(true);
+			if(resp.isAsync()) {
+				byte[] beanNameBytes = resp.getBeanName().getBytes(Constants.BEAN_NAME_CHARSET);
+				buf.putInt(beanNameBytes.length);
+				buf.put(beanNameBytes);
+				byte[] methodNameBytes = resp.getMethodName().getBytes(Constants.BEAN_NAME_CHARSET);
+				buf.putInt(methodNameBytes.length);
+				buf.put(methodNameBytes);
+				buf.putInt(resp.getOutputBuffer().limit());
+			}
+			buf.put(resp.getOutputBuffer());
+			buf.flip();
+			out.write(buf);
+		} else {
+			DefaultHttpResponse httpResponse = new DefaultHttpResponse();
+			
+			httpResponse.setStatus(HttpResponseStatus.OK);
+			httpResponse.setProtocolVersion(HttpVersion.HTTP_1_1);
+			httpResponse.setContentType("application/x-hessian");
+			httpResponse.setKeepAlive(true);
+			httpResponse.setHeader(HttpHeaderConstants.KEY_SERVER, "Missian");
+			if(resp.isAsync()) {
+				httpResponse.setHeader(Constants.HTTP_HEADER_ASYNC, "true");
+				httpResponse.setHeader(Constants.HTTP_HEADER_BEANNAME, resp.getBeanName());
+				httpResponse.setHeader(Constants.HTTP_HEADER_METHOD, resp.getMethodName());				
+			}
+			
+			IoBuffer body = resp.getOutputBuffer();
+			httpResponse.addHeader("Content-Length", String.valueOf(body.limit()));
+			httpResponse.setContent(body);
+			
+			httpResponseEncoder.encode(session, httpResponse, out);
 		}
-		buf.put(resp.getOutputBuffer());
-		buf.flip();
-		out.write(buf);
 	}
 
 }

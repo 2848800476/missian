@@ -61,6 +61,7 @@ public class MissianHandler extends IoHandlerAdapter {
 		String methodName = service.invoke(request.getInputStream(), os, serializerFactory);
 		
 		MissianResponse resp = new MissianResponse();
+		resp.setTransportProtocol(request.getTransportProtocol());
 		resp.setAsync(request.isAsync());
 		resp.setOutputBuffer(os.flip());
 		resp.setBeanName(request.getBeanName());

@@ -42,6 +42,7 @@ import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.services.server.AbstractSkeleton;
+import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.common.util.Constants;
 
@@ -56,13 +57,14 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 	private String beanName;
 	private SyncMissianProxyFactory _factory;
 	private WeakHashMap<Method, String> _mangleMap = new WeakHashMap<Method, String>();
-
+	private TransportProtocol transportProtocol;
 	public SyncMissianProxy(TransportURL url,
 			SyncMissianProxyFactory syncMissianProxyFactory) {
 		super();
 		this.host = url.getHost();
 		this.port = url.getPort();
 		this.beanName = url.getQuery();
+		transportProtocol = url.getTransport();
 		this._factory = syncMissianProxyFactory;
 	}
 
@@ -196,26 +198,36 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 			} catch (Exception e) {
 				throw new HessianRuntimeException(e);
 			}
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream(_factory.getSendBufferSize());
 			
 			
 			AbstractHessianOutput out = _factory.getHessianOutput(baos);
 			out.call(mangleName, args);
 			out.flush();
-//			os.write(baos.size());
-			byte[] beanNameBytes = beanName.getBytes(Constants.BEAN_NAME_CHARSET);
-			byte[] headerBytes = new byte[beanNameBytes.length+9];
-			//header[0] = 0 for a sync call, do not need to set 
-			System.arraycopy(intToByteArray(beanNameBytes.length), 0, headerBytes, 1, 4);
-			System.arraycopy(beanNameBytes, 0, headerBytes, 5, beanNameBytes.length);
-			System.arraycopy(intToByteArray(baos.size()), 0, headerBytes, 5+beanNameBytes.length, 4);
-			
-			os.write(headerBytes);
-			baos.writeTo(os);
-			
-			isValid = true;
-
+			if(transportProtocol==TransportProtocol.tcp) {
+				
+				byte[] beanNameBytes = beanName.getBytes(Constants.BEAN_NAME_CHARSET);
+				byte[] headerBytes = new byte[beanNameBytes.length+9];
+				System.arraycopy(intToByteArray(beanNameBytes.length), 0, headerBytes, 1, 4);
+				System.arraycopy(beanNameBytes, 0, headerBytes, 5, beanNameBytes.length);
+				System.arraycopy(intToByteArray(baos.size()), 0, headerBytes, 5+beanNameBytes.length, 4);
+				
+				os.write(headerBytes);
+				baos.writeTo(os);
+				
+				isValid = true;
+			} else {
+				StringBuilder builder = new StringBuilder(256);
+				builder.append("POST /").append(beanName).append(" HTTP/1.1").append("\r\n");
+				builder.append("Content-Type: application/x-hessian").append("\r\n");
+				builder.append("Host: ").append(host).append(':').append(port).append("\r\n");
+				builder.append("Connection: keep-alive").append("\r\n");
+				builder.append("Content-Length: ").append(baos.size()).append("\r\n");
+				builder.append("\r\n");
+				os.write(builder.toString().getBytes(Constants.BEAN_NAME_CHARSET));
+				baos.writeTo(os);
+				isValid = true;
+			}
 			return conn;
 		} finally {
 			if (!isValid && conn != null)
