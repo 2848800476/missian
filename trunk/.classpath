@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="example"/>
+	<classpathentry kind="src" path="core"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/hessian-4.0.7.jar" sourcepath="E:/资料及开源类库/hessian-4.0.7-src.jar"/>
+	<classpathentry kind="lib" path="lib/mina-core-2.0.1.jar" sourcepath="E:/资料及开源类库/mina/apache-mina-2.0.1-src/apache-mina-2.0.1/src/mina-core/src/main/java"/>
+	<classpathentry kind="lib" path="lib/org.springframework.core-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.context-3.0.5.RELEASE.jar" sourcepath="H:/Documents and Settings/stanley/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mina-integration-beans-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.asm-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.expression-3.0.5.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-pool-1.5.5.jar" sourcepath="E:/资料及开源类库/apache-commons/commons-pool-1.5.5/commons-pool-1.5.5-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
