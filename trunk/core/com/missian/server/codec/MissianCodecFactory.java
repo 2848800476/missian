@@ -30,18 +30,20 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.statemachine.DecodingStateProtocolDecoder;
 
+import com.missian.common.util.Constants;
+
 public class MissianCodecFactory implements ProtocolCodecFactory {
 	
 	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-		ProtocolDecoder decoder = (ProtocolDecoder)session.getAttribute(ProtocolDecoder.class);
+		ProtocolDecoder decoder = (ProtocolDecoder)session.getAttribute(Constants.DECODER);
 		if(decoder!=null) {
 			return decoder;
 		}
 		synchronized (session) {
-			decoder = (ProtocolDecoder)session.getAttribute(ProtocolDecoder.class);
+			decoder = (ProtocolDecoder)session.getAttribute(Constants.DECODER);
 			if(decoder==null) {
 				decoder = new DecodingStateProtocolDecoder(new MissianDecoderMachine());
-				session.setAttribute(ProtocolDecoder.class, decoder);
+				session.setAttribute(Constants.DECODER, decoder);
 			}			
 		}
 		return decoder;

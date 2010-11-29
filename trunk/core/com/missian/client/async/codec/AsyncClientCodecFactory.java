@@ -30,6 +30,8 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.statemachine.DecodingStateProtocolDecoder;
 
+import com.missian.common.util.Constants;
+
 
 /**
  * description:
@@ -41,14 +43,36 @@ public class AsyncClientCodecFactory implements ProtocolCodecFactory {
 	 * @see org.apache.mina.filter.codec.ProtocolCodecFactory#getDecoder(org.apache.mina.core.session.IoSession)
 	 */
 	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-		return new DecodingStateProtocolDecoder(new AsyncClientDecoderMachine());
+		ProtocolDecoder decoder = (ProtocolDecoder)session.getAttribute(Constants.DECODER);
+		if(decoder!=null) {
+			return decoder;
+		}
+		synchronized (session) {
+			decoder = (ProtocolDecoder)session.getAttribute(Constants.DECODER);
+			if(decoder==null) {
+				decoder = new DecodingStateProtocolDecoder(new AsyncClientDecoderMachine());
+				session.setAttribute(Constants.DECODER, decoder);
+			}			
+		}
+		return decoder;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.mina.filter.codec.ProtocolCodecFactory#getEncoder(org.apache.mina.core.session.IoSession)
 	 */
 	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-		return null;
+		ProtocolEncoder encoder = (ProtocolEncoder)session.getAttribute(Constants.ENCODER);
+		if(encoder!=null) {
+			return encoder;
+		}
+		synchronized (session) {
+			encoder = (ProtocolEncoder)session.getAttribute(Constants.ENCODER);
+			if(encoder==null) {
+				encoder = new AsyncClientRequestEncoder();
+				session.setAttribute(Constants.ENCODER, encoder);
+			}			
+		}
+		return encoder;
 	}
 
 }

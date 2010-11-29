@@ -32,4 +32,6 @@ public class Constants {
 	public static final String HTTP_HEADER_ASYNC = "Missian-Async";
 	public static final String HTTP_HEADER_BEANNAME = "Missian-Bean";
 	public static final String HTTP_HEADER_METHOD = "Missian-Method";
+	public static final String DECODER = "_DECODER_";
+	public static final String ENCODER = "_ENCODER_";
 }

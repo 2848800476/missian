@@ -45,7 +45,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import com.caucho.hessian.io.HessianRemoteObject;
 import com.missian.client.MissianProxyFactory;
-import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.client.async.codec.AsyncClientCodecFactory;
 import com.missian.common.beanlocate.BeanLocator;
@@ -103,7 +102,6 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	private boolean logAfterCodec;
 	private ExecutorService threadPool;
 	private boolean threadPoolCreated;
-	private TransportProtocol transport;
 	private ConcurrentHashMap<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 	private ReentrantLock lock = new ReentrantLock();
 		
@@ -115,7 +113,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 * @param logBeforeCodec
 	 * @param logAfterCodec
 	 */
-	public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool,
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool,
 			int callbackIoProcesses, boolean logBeforeCodec,
 			boolean logAfterCodec) {
 		super();
@@ -124,26 +122,25 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 		this.logBeforeCodec = logBeforeCodec;
 		this.logAfterCodec = logAfterCodec;
 		this.threadPool = threadPool;
-		this.transport = transport;
 	}
 
-	public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, ExecutorService threadPool) {
-		this(transport, callbackLoacator, threadPool, 1, false, true);
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool) {
+		this(callbackLoacator, threadPool, 1, false, true);
 	}		
 	
-	public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, int threadPoolSize,
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, int threadPoolSize,
 			int callbackIoProcesses, boolean logBeforeCodec,
 			boolean logAfterCodec) {
-		this(transport, callbackLoacator, Executors.newFixedThreadPool(threadPoolSize), callbackIoProcesses, logBeforeCodec, logAfterCodec);
+		this(callbackLoacator, Executors.newFixedThreadPool(threadPoolSize), callbackIoProcesses, logBeforeCodec, logAfterCodec);
 		this.threadPoolCreated = true;
 	}
 	
-	public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator, int threadPoolSize) {
-		this(transport, callbackLoacator, threadPoolSize, 1, false, true);
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, int threadPoolSize) {
+		this(callbackLoacator, threadPoolSize, 1, false, true);
 	}
 	
-	public AsyncMissianProxyFactory(TransportProtocol transport, BeanLocator callbackLoacator) {
-		this(transport, callbackLoacator, DEFAULT_THREAD_POOL);
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator) {
+		this(callbackLoacator, DEFAULT_THREAD_POOL);
 	}
 
 	public int getInitBufSize() {
@@ -220,9 +217,6 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 					"api must not be null for HessianProxyFactory.create()");
 		InvocationHandler handler = null;
 		TransportURL u = new TransportURL(url);
-		if(u.getTransport()!=transport){
-			throw new IllegalArgumentException("Unacceptable protocol:"+u.getTransport());
-		}
 		handler = new AsyncMissianProxy(callbackLoacator, u, this);
 		return Proxy.newProxyInstance(loader, new Class[] { api,
 				HessianRemoteObject.class }, handler);

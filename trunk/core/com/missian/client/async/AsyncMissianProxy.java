@@ -40,10 +40,11 @@ import com.caucho.hessian.client.HessianRuntimeException;
 import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.services.server.AbstractSkeleton;
+import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
+import com.missian.client.async.message.AsyncClientRequest;
 import com.missian.common.beanlocate.BeanLocator;
 import com.missian.common.io.IoBufferOutputStream;
-import com.missian.common.util.Constants;
 
 /**
  * description:
@@ -56,21 +57,17 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 	private String host;
 	private int port;
 	private String beanName;
-	private byte[] beanNameBytes;
-	private int beanNameLength;
 	private AsyncMissianProxyFactory _factory;
-//	private IoSession session;
 	private BeanLocator beanLocator;
-
+	private TransportProtocol transportProtocol;
 	public AsyncMissianProxy(BeanLocator beanLocator, TransportURL url, AsyncMissianProxyFactory asyncMissianProxyFactory) throws IOException {
 		super();
 		this.host = url.getHost();
 		this.port = url.getPort();
 		this.beanName = url.getQuery();
-		this.beanNameBytes = beanName.getBytes(Constants.BEAN_NAME_CHARSET);
-		this.beanNameLength = beanNameBytes.length;
 		this._factory = asyncMissianProxyFactory;
 		this.beanLocator = beanLocator;
+		this.transportProtocol = url.getTransport();
 	}
 
 	private WeakHashMap<Method, String> _mangleMap = new WeakHashMap<Method, String>();
@@ -145,24 +142,20 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 	
 	private void sendRequest(String mangleName, Object[] args) throws IOException {
 		try {
-			IoBuffer buffer = IoBuffer.allocate(_factory.getInitBufSize());
-			buffer.setAutoExpand(true);
-			buffer.put((byte)1);			
-			buffer.putInt(beanNameLength);
-			buffer.put(beanNameBytes);
-			
-			IoBufferOutputStream baos = new IoBufferOutputStream(_factory.getInitBufSize());
-			
-			
+			AsyncClientRequest request = new AsyncClientRequest();
+			request.setBeanName(beanName);
+			request.setTransportProtocol(transportProtocol);
+			request.setHost(host);
+			request.setPort(port);
+			IoBufferOutputStream baos = new IoBufferOutputStream(_factory.getInitBufSize());		
 			AbstractHessianOutput out = _factory.getHessianOutput(baos);
 			out.call(mangleName, args);
 			out.flush();
 			
 			IoBuffer body = baos.flip();
-			buffer.putInt(body.limit());
-			buffer.put(body);
-			buffer.flip();
-			getSession().write(buffer);
+			request.setOutputBuffer(body);
+
+			getSession().write(request);
 		} finally {
 			
 		}

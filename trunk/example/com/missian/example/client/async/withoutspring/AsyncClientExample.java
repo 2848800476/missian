@@ -27,7 +27,6 @@ package com.missian.example.client.async.withoutspring;
 
 import java.io.IOException;
 
-import com.missian.client.TransportProtocol;
 import com.missian.client.async.AsyncMissianProxyFactory;
 import com.missian.example.bean.Hello;
 
@@ -38,11 +37,11 @@ import com.missian.example.bean.Hello;
  */
 public class AsyncClientExample {
 	public static void main(String[] args) throws IOException {
-		AsyncMissianProxyFactory factory = new AsyncMissianProxyFactory(TransportProtocol.tcp, new SimpleBeanLocator());
+		AsyncMissianProxyFactory factory = new AsyncMissianProxyFactory(new SimpleBeanLocator());
 		factory.setHessian2Request(true);
 		factory.setHessian2Response(true);
 		factory.init();
-		Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
+		Hello hello = (Hello)factory.create(Hello.class, "http://localhost:1235/hello");
 		hello.hello("gg", 25);
 	}
 }
