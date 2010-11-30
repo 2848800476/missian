@@ -24,6 +24,8 @@
  */
 package com.missian.client;
 
+import com.missian.common.io.TransportProtocol;
+
 /**
  * description:
  * Trasnport url
@@ -35,8 +37,6 @@ package com.missian.client;
  * 
  */
 public class TransportURL {
-	private static final int HTTP_DEFAULT_PORT = 80;
-	private static final int TCP_DEFAULT_PORT = 9090;
 	private String url;
 	private TransportProtocol transport;
 	private String host;
@@ -53,13 +53,13 @@ public class TransportURL {
 		if(idx2<=0) {
 			throw new IllegalArgumentException("Illegal url:"+url);
 		}
-		transport = TransportProtocol.valueOf(url.substring(0, idx1));
+		transport = TransportProtocol.valueOf(url.substring(0, idx1).toLowerCase());
 		query = url.substring(idx2+1);
 		String hostPort = url.substring(idx1+3, idx2);
 		int idx3 = hostPort.indexOf(':');
 		if(idx3<0) {
 			host = hostPort;
-			port = transport == TransportProtocol.tcp ? TCP_DEFAULT_PORT : HTTP_DEFAULT_PORT;
+			port = transport.getDefaultPort();
 		} else {
 			host = hostPort.substring(0, idx3);
 			port = Integer.parseInt(hostPort.substring(idx3+1));
@@ -68,31 +68,16 @@ public class TransportURL {
 	public String getUrl() {
 		return url;
 	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
 	public TransportProtocol getTransport() {
 		return transport;
-	}
-	public void setTransport(TransportProtocol transport) {
-		this.transport = transport;
 	}
 	public String getHost() {
 		return host;
 	}
-	public void setHost(String host) {
-		this.host = host;
-	}
 	public int getPort() {
 		return port;
 	}
-	public void setPort(int port) {
-		this.port = port;
-	}
 	public String getQuery() {
 		return query;
-	}
-	public void setQuery(String query) {
-		this.query = query;
 	}
 }

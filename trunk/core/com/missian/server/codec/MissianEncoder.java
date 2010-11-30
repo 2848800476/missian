@@ -34,7 +34,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
-import com.missian.client.TransportProtocol;
+import com.missian.common.io.TransportProtocol;
 import com.missian.common.util.Constants;
 
 

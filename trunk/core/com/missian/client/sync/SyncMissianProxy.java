@@ -50,9 +50,9 @@ import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.services.server.AbstractSkeleton;
-import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.common.io.IoBufferInputStream;
+import com.missian.common.io.TransportProtocol;
 import com.missian.common.util.Constants;
 
 /**

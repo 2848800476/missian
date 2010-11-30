@@ -36,13 +36,7 @@ import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.missian.client.async.message.AsyncClientResponse;
 
-/**
- * @ClassName: AsyncClientHandler
- * @Description: TODO(这里用一句话描述这个类的作用)
- * @author 丁胜瑜(dingshengyu@snda.com)
- * @date 2010-11-26 下午05:43:26
- *
- */
+
 public class AsyncClientHandler extends IoHandlerAdapter {
 //	private BeanLocator beanLocator;
 	private AsyncMissianProxyFactory _factory;

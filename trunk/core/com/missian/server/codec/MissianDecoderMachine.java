@@ -38,8 +38,8 @@ import org.apache.mina.filter.codec.statemachine.DecodingStateMachine;
 import org.apache.mina.filter.codec.statemachine.FixedLengthDecodingState;
 import org.apache.mina.filter.codec.statemachine.IntegerDecodingState;
 
-import com.missian.client.TransportProtocol;
 import com.missian.common.io.IoBufferInputStream;
+import com.missian.common.io.TransportProtocol;
 import com.missian.common.util.Constants;
 
 public class MissianDecoderMachine extends DecodingStateMachine {

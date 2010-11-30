@@ -40,6 +40,7 @@ import org.apache.mina.core.future.IoFutureListener;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.filter.logging.LogLevel;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
@@ -160,11 +161,17 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 		
 	public void init() {
 		connector = new NioSocketConnector(callbackIoProcesses);
+		LoggingFilter loggingFilter = new LoggingFilter();
+		loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
+		loggingFilter.setMessageSentLogLevel(LogLevel.DEBUG);
+		loggingFilter.setSessionOpenedLogLevel(LogLevel.DEBUG);
+		loggingFilter.setSessionCreatedLogLevel(LogLevel.DEBUG);
+		loggingFilter.setSessionClosedLogLevel(LogLevel.DEBUG);
 		if(logBeforeCodec) {
-			connector.getFilterChain().addLast("log.1", new LoggingFilter());
+			connector.getFilterChain().addLast("log.1", loggingFilter);
 		}
 		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new AsyncClientCodecFactory()));
-		connector.getFilterChain().addLast("log.2", new LoggingFilter());
+		connector.getFilterChain().addLast("log.2", loggingFilter);
 		if(logAfterCodec) {
 			connector.getFilterChain().addLast("executor", new ExecutorFilter(threadPool));
 		}
