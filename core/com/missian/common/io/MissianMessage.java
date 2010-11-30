@@ -24,7 +24,6 @@
  */
 package com.missian.common.io;
 
-import com.missian.client.TransportProtocol;
 
 
 public class MissianMessage {

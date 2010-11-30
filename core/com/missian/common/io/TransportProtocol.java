@@ -22,13 +22,21 @@
  *   @author stanley
  *	 @date 2010-11-28
  */
-package com.missian.client;
+package com.missian.common.io;
 
 /**
  * description:
  * Trasnport protocols
  */
 public enum TransportProtocol {
-	tcp,
-	http
+	tcp(80),
+	http(80);
+	
+	private int defaltPort;
+	private TransportProtocol(int defaltPort){
+		this.defaltPort = defaltPort;
+	}
+	public int getDefaultPort() {
+		return defaltPort;
+	}
 }

@@ -4,7 +4,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="asyncMissianProxyFactory" class="com.missian.client.async.AsyncMissianProxyFactory" init-method="init" destroy-method="destroy">
-		<constructor-arg value="tcp"/>
 		<constructor-arg >
 			<bean class="com.missian.common.beanlocate.SpringLocator"/>
 		</constructor-arg>

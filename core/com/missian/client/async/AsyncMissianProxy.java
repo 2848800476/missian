@@ -40,11 +40,11 @@ import com.caucho.hessian.client.HessianRuntimeException;
 import com.caucho.hessian.io.AbstractHessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.caucho.services.server.AbstractSkeleton;
-import com.missian.client.TransportProtocol;
 import com.missian.client.TransportURL;
 import com.missian.client.async.message.AsyncClientRequest;
 import com.missian.common.beanlocate.BeanLocator;
 import com.missian.common.io.IoBufferOutputStream;
+import com.missian.common.io.TransportProtocol;
 
 /**
  * description:

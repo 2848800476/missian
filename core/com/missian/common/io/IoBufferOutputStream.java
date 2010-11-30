@@ -30,7 +30,7 @@ import java.io.OutputStream;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
- * 
+ * It works for Hessian, but Do NOT use this class anywhere else.
  *
  */
 public class IoBufferOutputStream extends OutputStream{

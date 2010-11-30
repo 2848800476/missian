@@ -24,15 +24,21 @@
  */
 package com.missian.example.bean;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.missian.client.async.Callback;
 
 public class HelloCallback extends Callback{
+	private AtomicInteger i = new AtomicInteger(0);
 	public HelloCallback() {
 		super(String.class);
 	}
 
 	@Override
 	public void call(Object obj) {
-		System.out.println(obj);
+		int value = i.incrementAndGet();
+		if(value%10000==0) {
+			System.out.println("received:"+value);
+		}
 	}
 }
