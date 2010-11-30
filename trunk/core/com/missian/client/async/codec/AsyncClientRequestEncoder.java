@@ -18,12 +18,10 @@ import com.missian.common.util.Constants;
 
 public class AsyncClientRequestEncoder implements ProtocolEncoder {
 	private HttpRequestEncoder httpEncoder = new HttpRequestEncoder();
-	@Override
 	public void dispose(IoSession session) throws Exception {
 
 	}
 
-	@Override
 	public void encode(IoSession session, Object message,
 			ProtocolEncoderOutput out) throws Exception {
 		AsyncClientRequest request = (AsyncClientRequest)message;
