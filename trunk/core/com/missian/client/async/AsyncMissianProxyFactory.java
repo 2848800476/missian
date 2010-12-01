@@ -46,6 +46,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import com.caucho.hessian.io.HessianRemoteObject;
 import com.missian.client.MissianProxyFactory;
+import com.missian.client.NetworkConfig;
 import com.missian.client.TransportURL;
 import com.missian.client.async.codec.AsyncClientCodecFactory;
 import com.missian.common.beanlocate.BeanLocator;
@@ -114,16 +115,23 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 * @param logBeforeCodec
 	 * @param logAfterCodec
 	 */
-	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool,
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool, 
 			int callbackIoProcesses, boolean logBeforeCodec,
-			boolean logAfterCodec) {
-		super();
+			boolean logAfterCodec, NetworkConfig networkConfig) {
+		super(networkConfig);
 		this.callbackLoacator = callbackLoacator;
 		this.callbackIoProcesses = callbackIoProcesses;
 		this.logBeforeCodec = logBeforeCodec;
 		this.logAfterCodec = logAfterCodec;
 		this.threadPool = threadPool;
 	}
+	
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool, 
+			int callbackIoProcesses, boolean logBeforeCodec,
+			boolean logAfterCodec) {
+		this(callbackLoacator, threadPool, callbackIoProcesses, logBeforeCodec, logAfterCodec, new NetworkConfig());
+	}
+
 
 	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool) {
 		this(callbackLoacator, threadPool, 1, false, true);
@@ -133,6 +141,17 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 			int callbackIoProcesses, boolean logBeforeCodec,
 			boolean logAfterCodec) {
 		this(callbackLoacator, Executors.newFixedThreadPool(threadPoolSize), callbackIoProcesses, logBeforeCodec, logAfterCodec);
+		this.threadPoolCreated = true;
+	}
+	
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool, NetworkConfig networkConfig) {
+		this(callbackLoacator, threadPool, 1, false, true, networkConfig);
+	}		
+	
+	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, int threadPoolSize,
+			int callbackIoProcesses, boolean logBeforeCodec,
+			boolean logAfterCodec, NetworkConfig networkConfig) {
+		this(callbackLoacator, Executors.newFixedThreadPool(threadPoolSize), callbackIoProcesses, logBeforeCodec, logAfterCodec, networkConfig);
 		this.threadPoolCreated = true;
 	}
 	

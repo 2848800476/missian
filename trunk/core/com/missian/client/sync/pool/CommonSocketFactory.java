@@ -24,17 +24,18 @@
  */
 package com.missian.client.sync.pool;
 
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 
-import com.missian.client.sync.SyncMissianProxyFactory;
+import com.missian.client.NetworkConfig;
 
 public class CommonSocketFactory implements KeyedPoolableObjectFactory {
-	private SyncMissianProxyFactory syncMissianProxyFactory;
-	public CommonSocketFactory(SyncMissianProxyFactory syncMissianProxyFactory) {
+	private NetworkConfig networkConfig;
+	public CommonSocketFactory(NetworkConfig networkConfig) {
 		super();
-		this.syncMissianProxyFactory = syncMissianProxyFactory;
+		this.networkConfig = networkConfig;
 	}
 
 	public void activateObject(Object key, Object obj) throws Exception {
@@ -48,7 +49,15 @@ public class CommonSocketFactory implements KeyedPoolableObjectFactory {
 
 	public Object makeObject(Object key) throws Exception {
 		ServerAddress address = (ServerAddress)key;
-		return syncMissianProxyFactory.createSocket(address.getHost(), address.getPort());
+		Socket conn = new Socket();
+		conn.setSoTimeout(networkConfig.getReadTimeout()*1000);
+		conn.setTcpNoDelay(networkConfig.isTcpNoDelay());
+		conn.setReuseAddress(networkConfig.isReuseAddress());
+		conn.setSoLinger(networkConfig.getSoLinger()>0, networkConfig.getSoLinger());
+		conn.setSendBufferSize(networkConfig.getSendBufferSize());
+		conn.setReceiveBufferSize(networkConfig.getReceiveBufferSize());
+		conn.connect(new InetSocketAddress(address.getHost(), address.getPort()), networkConfig.getConnectTimeout()*1000);
+		return conn;
 	}
 
 	public void passivateObject(Object key, Object obj) throws Exception {

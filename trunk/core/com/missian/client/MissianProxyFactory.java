@@ -42,27 +42,51 @@ public abstract class MissianProxyFactory {
 	private ClassLoader loader;
 	private SerializerFactory serializerFactory;
 	// tcp configurations
-	private int connectTimeout = 10;
-	private boolean tcpNoDelay = true;
-	private boolean reuseAddress = true;
-	private int soLinger = -1;
-	private int sendBufferSize = 256;
-	private int receiveBufferSize = 1024;
-
-	// hessian configurationso
+		// hessian configurationso
 	private boolean hessian2Request = true;
 	private boolean hessian2Response = true;
 	private boolean overloadEnabled = true;
+	private NetworkConfig networkConfig = null;
+	
+	public int getConnectTimeout() {
+		return networkConfig.getConnectTimeout();
+	}
+
+	public int getReadTimeout() {
+		return networkConfig.getReadTimeout();
+	}
+
+	public int getReceiveBufferSize() {
+		return networkConfig.getReceiveBufferSize();
+	}
+
+	public int getSendBufferSize() {
+		return networkConfig.getSendBufferSize();
+	}
+
+	public int getSoLinger() {
+		return networkConfig.getSoLinger();
+	}
+
+	public boolean isReuseAddress() {
+		return networkConfig.isReuseAddress();
+	}
+
+	public boolean isTcpNoDelay() {
+		return networkConfig.isTcpNoDelay();
+	}
+
 	public void setOverloadEnabled(boolean overloadEnabled) {
 		this.overloadEnabled = overloadEnabled;
 	}	
 
-	public MissianProxyFactory() {
-		this(Thread.currentThread().getContextClassLoader());
+	public MissianProxyFactory(NetworkConfig networkConfig) {
+		this(networkConfig, Thread.currentThread().getContextClassLoader());
 	}
 
-	public MissianProxyFactory(ClassLoader loader) {
+	public MissianProxyFactory(NetworkConfig networkConfig, ClassLoader loader) {
 		this.loader = loader;
+		this.networkConfig = networkConfig;
 	}
 
 	public boolean isHessian2Request() {
@@ -81,60 +105,12 @@ public abstract class MissianProxyFactory {
 		this.hessian2Response = hessian2Response;
 	}
 
-	public int getReceiveBufferSize() {
-		return receiveBufferSize;
-	}
-
-	public void setReceiveBufferSize(int receiveBufferSize) {
-		this.receiveBufferSize = receiveBufferSize;
-	}
-
 	public ClassLoader getLoader() {
 		return loader;
 	}
 
 	public void setLoader(ClassLoader loader) {
 		this.loader = loader;
-	}
-
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
-
-	public void setConnectTimeout(int connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
-	
-	public boolean isTcpNoDelay() {
-		return tcpNoDelay;
-	}
-
-	public void setTcpNoDelay(boolean tcpNoDelay) {
-		this.tcpNoDelay = tcpNoDelay;
-	}
-
-	public boolean isReuseAddress() {
-		return reuseAddress;
-	}
-
-	public void setReuseAddress(boolean reuseAddress) {
-		this.reuseAddress = reuseAddress;
-	}
-
-	public int getSoLinger() {
-		return soLinger;
-	}
-
-	public void setSoLinger(int soLinger) {
-		this.soLinger = soLinger;
-	}
-
-	public int getSendBufferSize() {
-		return sendBufferSize;
-	}
-
-	public void setSendBufferSize(int sendBufferSize) {
-		this.sendBufferSize = sendBufferSize;
 	}
 
 	public AbstractHessianOutput getHessianOutput(OutputStream os) {
