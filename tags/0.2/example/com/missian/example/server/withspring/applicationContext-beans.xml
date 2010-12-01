@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.net.SocketAddress">
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+	<!-- The IoHandler implementation -->
+	<bean id="minaHandler" class="com.missian.server.handler.MissianHandler">
+		<constructor-arg>
+			<bean class="com.missian.common.beanlocate.SpringLocator" />
+		</constructor-arg>
+	</bean>
+
+	<!-- the IoFilters -->
+	<bean id="executorFilter" class="org.apache.mina.filter.executor.ExecutorFilter" />
+	<bean id="codecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+		<constructor-arg>
+			<bean class="com.missian.server.codec.MissianCodecFactory" />
+		</constructor-arg>
+	</bean>
+	<bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter">
+		<property name="messageReceivedLogLevel" value="DEBUG"/>
+		<property name="messageSentLogLevel" value="DEBUG"/>
+		<property name="sessionCreatedLogLevel" value="DEBUG"/>
+		<property name="sessionClosedLogLevel" value="DEBUG"/>
+		<property name="sessionIdleLogLevel" value="DEBUG"/>
+		<property name="sessionOpenedLogLevel" value="DEBUG"/>
+	</bean>
+	<!-- The non-SSL filter chain. -->
+	<bean id="filterChainBuilder"
+		class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">
+		<property name="filters">
+			<map>
+				<entry key="codecFilter" value-ref="codecFilter" />
+				<entry key="executor" value-ref="executorFilter" />
+				<entry key="loggingFilter" value-ref="loggingFilter" />
+			</map>
+		</property>
+	</bean>
+	<!-- The IoAcceptor which binds to port 1235 server side -->
+	<bean id="minaAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor"
+		init-method="bind" destroy-method="unbind">
+		<property name="defaultLocalAddress" value=":1235" />
+		<property name="handler" ref="minaHandler" />
+		<property name="reuseAddress" value="true" />
+		<property name="filterChainBuilder" ref="filterChainBuilder" />
+	</bean>
+
+	<!-- your business bean, missian client will call this bean by 'hello' -->
+	<bean id="hello" class="com.missian.example.bean.HelloImpl"></bean>
+
+</beans>
