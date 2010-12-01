@@ -26,6 +26,7 @@ package com.missian.example.client.sync;
 
 import java.io.IOException;
 
+import com.missian.client.NetworkConfig;
 import com.missian.client.sync.SyncMissianProxyFactory;
 import com.missian.client.sync.pool.CommonSocketPool;
 import com.missian.example.bean.Hello;
@@ -37,9 +38,9 @@ public class SyncClientExample {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		SyncMissianProxyFactory factory = new SyncMissianProxyFactory();
-		factory.setReadTimeout(100);
-		factory.setSocketPool(new CommonSocketPool(factory));
+		NetworkConfig config = new NetworkConfig();
+		config.setConnectTimeout(20);
+		SyncMissianProxyFactory factory = new SyncMissianProxyFactory(new CommonSocketPool(config));
 		Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
 		System.out.println(hello.hello("hy", 27));
 	}

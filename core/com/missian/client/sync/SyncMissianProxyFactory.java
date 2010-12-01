@@ -31,35 +31,28 @@ import java.net.Socket;
 
 import com.caucho.hessian.io.HessianRemoteObject;
 import com.missian.client.MissianProxyFactory;
+import com.missian.client.NetworkConfig;
 import com.missian.client.TransportURL;
 import com.missian.client.sync.pool.SocketPool;
 
 public class SyncMissianProxyFactory extends MissianProxyFactory{
 	// tcp configurations
-	private int readTimeout = 20;
 	private boolean connectionKeepAlive = false;
 	private SocketPool socketPool;
 	public SyncMissianProxyFactory() {
+		this(new NetworkConfig());
+	}
+	
+	public SyncMissianProxyFactory(NetworkConfig networkConfig) {
+		super(networkConfig);
 		this.connectionKeepAlive = false;
 	}
 	public SyncMissianProxyFactory(SocketPool socketPool) {
-		this.socketPool = socketPool;
-		connectionKeepAlive = true;
-	}
-	
-	public void setSocketPool(SocketPool socketPool) {
+		super(null);
 		this.socketPool = socketPool;
 		this.connectionKeepAlive = true;
 	}
-	public int getReadTimeout() {
-		return readTimeout;
-	}
-
-	public void setReadTimeout(int readTimeout) {
-		this.readTimeout = readTimeout;
-	}
-
-
+	
 	public Object create(Class<?> api, String url,
 			ClassLoader loader) {
 		if (api == null)

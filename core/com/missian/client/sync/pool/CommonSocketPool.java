@@ -28,13 +28,16 @@ import java.net.Socket;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
-import com.missian.client.sync.SyncMissianProxyFactory;
+import com.missian.client.NetworkConfig;
 
 public class CommonSocketPool implements SocketPool {
 	private GenericKeyedObjectPool pool;
+	public CommonSocketPool(){
+		this(new NetworkConfig());
+	}
 	
-	public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory) {
-        pool = new GenericKeyedObjectPool(new CommonSocketFactory(syncMissianProxyFactory));
+	public CommonSocketPool(NetworkConfig networkConfig) {
+        pool = new GenericKeyedObjectPool(new CommonSocketFactory(networkConfig));
     }
 
     /**
@@ -43,8 +46,8 @@ public class CommonSocketPool implements SocketPool {
      * if not <code>null</code>
      * @param config a non-<code>null</code> {@link CommonSocketPool.Config} describing the configuration
      */
-    public CommonSocketPool(SyncMissianProxyFactory syncMissianProxyFactory, GenericKeyedObjectPool.Config config) {
-    	pool = new GenericKeyedObjectPool(new CommonSocketFactory(syncMissianProxyFactory), config);
+    public CommonSocketPool(NetworkConfig networkConfig, GenericKeyedObjectPool.Config config) {
+    	pool = new GenericKeyedObjectPool(new CommonSocketFactory(networkConfig), config);
     }
 
 	
