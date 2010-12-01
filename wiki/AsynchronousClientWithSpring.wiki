@@ -1,4 +1,5 @@
 Create an asynchronous client stub and make an asynchronous remote call.
+It's updated from v0.30.
 
 = Introduction =
 
@@ -8,20 +9,15 @@ Create an asynchronous client stub and make an asynchronous remote call.
 = Details =
 
 ==Step 1:Create a Callback class ==
-An asynchronous call requires a callback class which extends from Callback:
+An asynchronous call requires a callback class which has a method accepting thre result object:
 {{{
-public class HelloCallback extends Callback{
-	public HelloCallback() {
-		super(String.class);
-	}
-
-	@Override
-	public void call(Object obj) {
-		System.out.println(obj);
+public class HelloCallback {
+	public void hello(String returnValue) {
+		System.out.println(returnValue);
 	}
 }
 }}}
-
+'Hello' interface has a "String hello(String, int)" method, so this callback class must have a "hello(String)" method.  
 
 ==Step 2: Use CallbackTarget annotation to annotate the interface method ==
 The Hello interface looks like this for an synchronous call:
@@ -32,8 +28,8 @@ public interface Hello {
 }}}
 But for an asynchronous call:
 {{{
+@CallbackTarget("helloCallback")
 public interface Hello {
-	@CallbackTarget("helloCallback")
 	public String hello(String name, int age);
 }
 }}}
