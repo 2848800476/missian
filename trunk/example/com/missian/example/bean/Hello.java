@@ -26,7 +26,7 @@ package com.missian.example.bean;
 
 import com.missian.client.async.CallbackTarget;
 
+@CallbackTarget("helloCallback")
 public interface Hello {
-	@CallbackTarget("helloCallback")
 	public String hello(String name, int age);
 }

@@ -44,7 +44,7 @@ public class AsyncClientWithSpring {
 		AsyncMissianProxyFactory asyncMissianProxyFactory = (AsyncMissianProxyFactory)context.getBean("asyncMissianProxyFactory");
 		Hello hello = (Hello)asyncMissianProxyFactory.create(Hello.class, "tcp://localhost:1235/hello");
 		long time = System.currentTimeMillis();
-		for(int i=0; i<100000; i++) {
+		for(int i=0; i<10000; i++) {
 			hello.hello("gg", 25);	
 		}
 		System.out.println(System.currentTimeMillis()-time);

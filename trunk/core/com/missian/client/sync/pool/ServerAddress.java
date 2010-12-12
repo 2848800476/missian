@@ -24,7 +24,7 @@
  */
 package com.missian.client.sync.pool;
 
-public class ServerAddress {
+class ServerAddress {
 	private String host;
 	private int port;
 	
