@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * this is used to annotate a remote stub method, so that the async returned object call be passed to a Callback
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 public @interface CallbackTarget {
 	String value();
 }

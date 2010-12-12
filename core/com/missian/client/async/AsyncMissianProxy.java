@@ -79,8 +79,6 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
-		CallbackTarget async = method.getAnnotation(CallbackTarget.class);
-		Callback cb = async == null ? null : (Callback)beanLocator.lookup(async.value());
 		String mangleName;
 
 		synchronized (_mangleMap) {
@@ -124,13 +122,28 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 				_mangleMap.put(method, mangleName);
 			}
 		}
-
+		
 		try {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Missian[" + toString() + "] calling " + mangleName);
-			if(cb!=null) {
-				_factory.setCallback(beanName, mangleName, cb);
+			if(_factory.getCallBack(beanName, mangleName)==null) {
+				CallbackTarget async = method.getDeclaringClass().getAnnotation(CallbackTarget.class);
+				if(async==null && method.getReturnType()!=void.class) {
+					throw new IllegalAccessError("Its return type is not 'void', callback object is required.");
+				} else if(async!=null) {
+					Object callbackBean = async == null ? null : (Object)beanLocator.lookup(async.value());
+					if(callbackBean==null) {
+						throw new IllegalAccessError("No callback found for '"+async.value()+"'.");
+					}
+					try {
+						Method callbackMethod = callbackBean.getClass().getMethod(method.getName(), method.getReturnType());
+						_factory.setCallback(beanName, mangleName, new Callback(callbackBean, callbackMethod, method.getReturnType()));
+					} catch(NoSuchMethodException e) {
+						throw new IllegalAccessError("No callback method found for '"+method.getName()+"'.");
+					}					
+				}				
 			}
+			
 			sendRequest(mangleName, args);
 			return null;
 		} catch (HessianProtocolException e) {

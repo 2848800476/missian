@@ -24,25 +24,26 @@
  */
 package com.missian.client.async;
 
+import java.lang.reflect.Method;
+
 /**
  * description:
- * The AsyncClientHandler looks up a Callback when received a remote returned message, 
- * and invoke its call() method.
+ * The AsyncClientHandler looks up a Callback when received a remote returned message
  */
-public abstract class Callback {
-	/**
-	 * it used by hessian protocol to decode binary data to the acceptable object 
-	 */
+public class Callback {
+	private Method callbackMethod;
 	private Class<?> acceptValueType;
-
+	private Object callbackBean;
+	public Callback(Object callbackBean, Method callbackMethod, Class<?> acceptValueType) {
+		super();
+		this.callbackMethod = callbackMethod;
+		this.acceptValueType = acceptValueType;
+		this.callbackBean = callbackBean;
+	}
 	public Class<?> getAcceptValueType() {
 		return acceptValueType;
 	}
-
-	public Callback(Class<?> acceptValueType) {
-		super();
-		this.acceptValueType = acceptValueType;
+	public void call(Object receivedObject) throws Exception{
+		callbackMethod.invoke(callbackBean, receivedObject);
 	}
-
-	public abstract void call(Object obj);
 }
