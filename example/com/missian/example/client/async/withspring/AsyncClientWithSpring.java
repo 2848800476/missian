@@ -29,7 +29,7 @@ import java.io.IOException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.missian.client.async.AsyncMissianProxyFactory;
-import com.missian.example.bean.Hello;
+import com.missian.example.bean.client.Hello;
 
 public class AsyncClientWithSpring {
 

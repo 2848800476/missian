@@ -66,6 +66,7 @@ public class MissianHandler extends IoHandlerAdapter {
 		resp.setOutputBuffer(os.flip());
 		resp.setBeanName(request.getBeanName());
 		resp.setMethodName(methodName);
+		resp.setSequence(request.getSequence());
 		session.write(resp);
 	}
 

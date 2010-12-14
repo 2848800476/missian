@@ -22,11 +22,13 @@
  *   @author stanley
  *	 @date 2010-11-28
  */
-package com.missian.example.bean;
+package com.missian.example.bean.server;
 
-import com.missian.client.async.CallbackTarget;
 
-@CallbackTarget("helloCallback")
-public interface Hello {
-	public String hello(String name, int age);
+public class HelloImpl {
+
+	public String hello(String name, int age) {
+		return "hi, "+name+", "+age;
+	}
+
 }

@@ -25,7 +25,7 @@
 package com.missian.example.server.withoutspring;
 
 import com.missian.common.beanlocate.BeanLocator;
-import com.missian.example.bean.HelloImpl;
+import com.missian.example.bean.server.HelloImpl;
 
 public class ExampleBeanLocator implements BeanLocator{
 

@@ -59,6 +59,7 @@ public class MissianEncoder implements ProtocolEncoder {
 				byte[] methodNameBytes = resp.getMethodName().getBytes(Constants.BEAN_NAME_CHARSET);
 				buf.putInt(methodNameBytes.length);
 				buf.put(methodNameBytes);
+				buf.putInt(resp.getSequence());
 				buf.putInt(resp.getOutputBuffer().limit());
 			}
 			buf.put(resp.getOutputBuffer());
@@ -73,7 +74,7 @@ public class MissianEncoder implements ProtocolEncoder {
 			httpResponse.setKeepAlive(true);
 			httpResponse.setHeader(HttpHeaderConstants.KEY_SERVER, "Missian");
 			if(resp.isAsync()) {
-				httpResponse.setHeader(Constants.HTTP_HEADER_ASYNC, "true");
+				httpResponse.setHeader(Constants.HTTP_HEADER_SEQ, String.valueOf(resp.getSequence()));
 				httpResponse.setHeader(Constants.HTTP_HEADER_BEANNAME, resp.getBeanName());
 				httpResponse.setHeader(Constants.HTTP_HEADER_METHOD, resp.getMethodName());				
 			}

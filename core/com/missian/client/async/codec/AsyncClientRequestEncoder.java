@@ -33,7 +33,7 @@ public class AsyncClientRequestEncoder implements ProtocolEncoder {
 			byte[] beanNameBytes = request.getBeanName().getBytes(Constants.BEAN_NAME_CHARSET);
 			buffer.putInt(beanNameBytes.length);
 			buffer.put(beanNameBytes);
-			
+			buffer.putInt(request.getSequence());
 			buffer.putInt(request.getOutputBuffer().limit());
 			buffer.put(request.getOutputBuffer());
 			buffer.flip();
@@ -47,7 +47,7 @@ public class AsyncClientRequestEncoder implements ProtocolEncoder {
 			httpRequest.setKeepAlive(true);
 			String host = request.getHost() + (request.getPort()==80 ? "" :":"+request.getPort());
 			httpRequest.setHeader(HttpHeaderConstants.KEY_HOST, host);
-			httpRequest.setHeader(Constants.HTTP_HEADER_ASYNC, "true");
+			httpRequest.setHeader(Constants.HTTP_HEADER_SEQ, String.valueOf(request.getSequence()));
 			httpRequest.setHeader(HttpHeaderConstants.KEY_CONTENT_LENGTH, String.valueOf(request.getOutputBuffer().limit()));
 			httpRequest.setContent(request.getOutputBuffer());
 			httpEncoder.encode(session, httpRequest, out);

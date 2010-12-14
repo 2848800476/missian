@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -77,10 +78,10 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 	 */
 	private static final long serialVersionUID = -138089145263434181L;
 
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(Object proxy, final Method method, Object[] args)
 			throws Throwable {
 		String mangleName;
-
+		Object returnObj = null;
 		synchronized (_mangleMap) {
 			mangleName = _mangleMap.get(method);
 		}
@@ -116,36 +117,84 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 			if (!_factory.isOverloadEnabled())
 				mangleName = method.getName();
 			else
-				mangleName = mangleName(method);
+				mangleName = mangleName(method, false);
 
 			synchronized (_mangleMap) {
 				_mangleMap.put(method, mangleName);
 			}
 		}
 		
+		int sequence = -1;
+		
 		try {
 			if (log.isLoggable(Level.FINER))
 				log.finer("Missian[" + toString() + "] calling " + mangleName);
 			if(_factory.getCallBack(beanName, mangleName)==null) {
 				CallbackTarget async = method.getDeclaringClass().getAnnotation(CallbackTarget.class);
-				if(async==null && method.getReturnType()!=void.class) {
-					throw new IllegalAccessError("Its return type is not 'void', callback object is required.");
-				} else if(async!=null) {
-					Object callbackBean = async == null ? null : (Object)beanLocator.lookup(async.value());
+				CallbackTargetMethod asyncMethod = method.getAnnotation(CallbackTargetMethod.class);
+				
+				if(method.getReturnType()==void.class) {
+//					throw new IllegalAccessError("Its return type is not 'void', callback object is required.");
+				} else if(async!=null && asyncMethod!=null) {
+					final Object callbackBean = async == null ? null : (Object)beanLocator.lookup(async.value());
 					if(callbackBean==null) {
 						throw new IllegalAccessError("No callback found for '"+async.value()+"'.");
 					}
 					try {
-						Method callbackMethod = callbackBean.getClass().getMethod(method.getName(), method.getReturnType());
-						_factory.setCallback(beanName, mangleName, new Callback(callbackBean, callbackMethod, method.getReturnType()));
+						String callbackName = asyncMethod==null ? method.getName() : asyncMethod.value();
+						final Method callbackMethod = callbackBean.getClass().getMethod(callbackName, method.getReturnType());
+						_factory.setCallback(beanName, mangleName, new Callback(){
+							@Override
+							public void call(Object value) throws Exception {
+								callbackMethod.invoke(callbackBean, value);
+							}
+							@Override
+							public Class<?> getAcceptValueType() {
+								
+								return method.getReturnType();
+							}
+						});
 					} catch(NoSuchMethodException e) {
 						throw new IllegalAccessError("No callback method found for '"+method.getName()+"'.");
 					}					
-				}				
+				} else if(isLastParamACallback(method)) {
+					Callback callback = (Callback)args[args.length-1];
+					Object[] newArgs = new Object[args.length-1];
+					for(int i=0; i<args.length-1; i++) {
+						newArgs[i] = args[i];
+					}
+					args = newArgs;
+					sequence = _factory.setCallback(callback);
+					mangleName = mangleName(method, true);
+				} else if(isReturnTypeAFuture(method) && args.length>0) {
+					//create the future and callback
+					final AsyncFuture<Object> future = new AsyncFuture<Object>();
+					final Class<?> lastArg = (Class<?>)args[args.length-1];
+					Callback callback = new Callback(){
+						@Override
+						public void call(Object value) throws Exception {
+							future.done(value);
+						}
+
+						@Override
+						public Class<?> getAcceptValueType() {
+							return lastArg;
+						}
+					};
+					//the last arg is the remote return type, needn't send to the server side.
+					Object[] newArgs = new Object[args.length-1];
+					for(int i=0; i<args.length-1; i++) {
+						newArgs[i] = args[i];
+					}
+					args = newArgs;
+					sequence = _factory.setCallback(callback);
+					returnObj = future;
+					mangleName = mangleName(method, true);
+				}
 			}
 			
-			sendRequest(mangleName, args);
-			return null;
+			sendRequest(mangleName, sequence, args);
+			return returnObj;
 		} catch (HessianProtocolException e) {
 			throw new HessianRuntimeException(e);
 		} finally {
@@ -153,13 +202,27 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 		}
 	}
 	
-	private void sendRequest(String mangleName, Object[] args) throws IOException {
+	private boolean isReturnTypeAFuture(Method method) {
+		return AsyncFuture.class.isAssignableFrom(method.getReturnType());
+	}
+
+	private boolean isLastParamACallback(Method method) {
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		if(parameterTypes.length==0) {
+			return false;
+		}
+		Class<?> lastParam = parameterTypes[parameterTypes.length-1];
+		return Callback.class.isAssignableFrom(lastParam);
+	}
+
+	private void sendRequest(String mangleName, int sequence, Object[] args) throws IOException {
 		try {
 			AsyncClientRequest request = new AsyncClientRequest();
 			request.setBeanName(beanName);
 			request.setTransportProtocol(transportProtocol);
 			request.setHost(host);
 			request.setPort(port);
+			request.setSequence(sequence);
 			IoBufferOutputStream baos = new IoBufferOutputStream(_factory.getInitBufSize());		
 			AbstractHessianOutput out = _factory.getHessianOutput(baos);
 			out.call(mangleName, args);
@@ -222,13 +285,20 @@ public class AsyncMissianProxy implements InvocationHandler, Serializable {
 				+ ", server=" + host + "]";
 	}
 
-	protected String mangleName(Method method) {
-		Class<?>[] param = method.getParameterTypes();
-
-		if (param == null || param.length == 0)
-			return method.getName();
-		else
-			return AbstractSkeleton.mangleName(method, false);
+	public static String mangleName(Method method, boolean isCallback)
+	{
+	    StringBuffer sb = new StringBuffer();
+	    
+	    sb.append(method.getName());
+	    
+	    Class []params = method.getParameterTypes();
+	    int len = isCallback ? params.length -1 : params.length;
+	    for (int i = 0; i < len; i++) {
+	      sb.append('_');
+	      sb.append(AbstractSkeleton.mangleClass(params[i], false));
+	    }
+	
+	    return sb.toString();
 	}
 
 	public static final byte[] intToByteArray(int value) {

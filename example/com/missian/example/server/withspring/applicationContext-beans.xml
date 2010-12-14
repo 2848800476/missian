@@ -55,6 +55,6 @@
 	</bean>
 
 	<!-- your business bean, missian client will call this bean by 'hello' -->
-	<bean id="hello" class="com.missian.example.bean.HelloImpl"></bean>
+	<bean id="hello" class="com.missian.example.bean.server.HelloImpl"></bean>
 
 </beans>
