@@ -22,31 +22,19 @@
  *   @author stanley
  *	 @date 2010-11-28
  */
-package com.missian.common.io;
+package com.missian.example.bean.client;
 
+import com.missian.client.async.AsyncFuture;
+import com.missian.client.async.Callback;
+import com.missian.client.async.CallbackTarget;
+import com.missian.client.async.CallbackTargetMethod;
 
-
-public class MissianMessage {
-	private String beanName;
-	private TransportProtocol transportProtocol;
-	private int sequence;
+@CallbackTarget("helloCallback")
+public interface Hello {
+	@CallbackTargetMethod("hello0")
+	public String hello(String name, int age);
 	
-	public int getSequence() {
-		return sequence;
-	}
-	public void setSequence(int sequence) {
-		this.sequence = sequence;
-	}
-	public TransportProtocol getTransportProtocol() {
-		return transportProtocol;
-	}
-	public void setTransportProtocol(TransportProtocol transportProtocol) {
-		this.transportProtocol = transportProtocol;
-	}
-	public String getBeanName() {
-		return beanName;
-	}
-	public void setBeanName(String beanName) {
-		this.beanName = beanName;
-	}
+	public String hello(String name, int age, Callback cb);
+	
+	public AsyncFuture<String> hello(String name, int age, Class<String> returnType);
 }

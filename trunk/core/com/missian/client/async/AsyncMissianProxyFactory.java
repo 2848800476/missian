@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.mina.core.future.ConnectFuture;
@@ -96,6 +97,7 @@ import com.missian.common.util.Constants;
 public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	private static final int DEFAULT_THREAD_POOL = 4;
 	private Map<String, Map<String, Callback>> callbackMap = new ConcurrentHashMap<String, Map<String, Callback>>();
+	private Map<Integer, Callback> sequenceCallbackMap = new ConcurrentHashMap<Integer, Callback>();
 	private int initBufSize = Constants.INIT_BUF_SIZE;
 	private NioSocketConnector connector;
 	private BeanLocator callbackLoacator;
@@ -106,7 +108,9 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	private boolean threadPoolCreated;
 	private ConcurrentHashMap<String, IoSession> sessionMap = new ConcurrentHashMap<String, IoSession>();
 	private ReentrantLock lock = new ReentrantLock();
-		
+	private boolean init = false;
+	
+	private AtomicInteger sequenceGenerator = new AtomicInteger(0);
 	/**
 	 * @param transport
 	 * @param callbackLoacator
@@ -124,6 +128,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 		this.logBeforeCodec = logBeforeCodec;
 		this.logAfterCodec = logAfterCodec;
 		this.threadPool = threadPool;
+		init();
 	}
 	
 	public AsyncMissianProxyFactory(BeanLocator callbackLoacator, ExecutorService threadPool, 
@@ -178,7 +183,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 		}
 	}
 		
-	public void init() {
+	private void init() {
 		connector = new NioSocketConnector(callbackIoProcesses);
 		LoggingFilter loggingFilter = new LoggingFilter();
 		loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
@@ -201,6 +206,7 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 		connector.getSessionConfig().setSoLinger(getSoLinger());		
 		connector.setHandler(new AsyncClientHandler(this));
 		connector.setConnectTimeoutMillis(getConnectTimeout()*1000);
+		this.init = true;
 	}
 	/**
 	 * The AsyncClientHandler calls this method to get the callback objects.
@@ -229,6 +235,32 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	}
 	
 	/**
+	 * The AsyncClientHandler calls this method to get the callback objects.
+	 * @param beanName
+	 * @param methodName
+	 * @return
+	 */
+	Callback getAndRemoveCallBack(int sequence) {
+		Callback ret = sequenceCallbackMap.get(sequence);
+		if(ret!=null) {
+			sequenceCallbackMap.remove(sequence);
+		}
+		return ret;
+	}
+	
+	/**
+	 * The proxy instances call this method to cache the callback objects.
+	 * @param beanName
+	 * @param methodName
+	 * @param callback
+	 */
+	int setCallback(Callback callback) {
+		int sequence = sequenceGenerator.incrementAndGet();
+		sequenceCallbackMap.put(sequence, callback);
+		return sequence;
+	}
+	
+	/**
 	 * Create a remote stub for api class.
 	 * @param api the interface to create stub for.
 	 * @param url the url this stub talks to.
@@ -238,6 +270,9 @@ public class AsyncMissianProxyFactory extends MissianProxyFactory {
 	 */
 	public Object create(Class<?> api, String url,
 			ClassLoader loader) throws IOException  {
+		if(!init) {
+			throw new IOException("Factory is not initialized, please call init() before calling create()");
+		}
 		if (api == null)
 			throw new NullPointerException(
 					"api must not be null for HessianProxyFactory.create()");

@@ -29,7 +29,7 @@ import java.io.IOException;
 import com.missian.client.NetworkConfig;
 import com.missian.client.sync.SyncMissianProxyFactory;
 import com.missian.client.sync.pool.CommonSocketPool;
-import com.missian.example.bean.Hello;
+import com.missian.example.bean.client.Hello;
 
 public class SyncClientExample {
 

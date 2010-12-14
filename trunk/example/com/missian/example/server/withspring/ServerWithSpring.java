@@ -27,12 +27,10 @@ package com.missian.example.server.withspring;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ServerWithSpring {
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		new ClassPathXmlApplicationContext("com/missian/example/server/withspring/applicationContext-*.xml");
 	}
-
 }

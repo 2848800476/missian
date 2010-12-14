@@ -22,13 +22,19 @@
  *   @author stanley
  *	 @date 2010-11-28
  */
-package com.missian.example.bean;
+package com.missian.client.async;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class HelloImpl implements Hello {
-
-	public String hello(String name, int age) {
-		return "hi, "+name+", "+age;
-	}
-
+/**
+ * description:
+ * this is used to annotate a remote stub method, so that the async returned object call be passed to a Callback
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface CallbackTargetMethod {
+	String value();
 }

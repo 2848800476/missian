@@ -56,15 +56,16 @@ public class AsyncClientDecoderMachine extends DecodingStateMachine {
 	@Override
 	protected DecodingState finishDecode(List<Object> childProducts,
 			ProtocolDecoderOutput out) throws Exception {
-		if(childProducts.size()<3) {
+		if(childProducts.size()<4) {
 			return null;
 		}
 		int childs = childProducts.size();
-		for(int i=0; i<childs; i=i+3) {
+		for(int i=0; i<childs; i=i+4) {
 			AsyncClientResponse response = new AsyncClientResponse();
-			response.setBeanName((String)childProducts.get(0));
-			response.setMethodName((String)childProducts.get(1));
-			response.setInputStream((InputStream)childProducts.get(2));
+			response.setBeanName((String)childProducts.get(i));
+			response.setMethodName((String)childProducts.get(i+1));
+			response.setSequence((Integer)childProducts.get(i+2));
+			response.setInputStream((InputStream)childProducts.get(i+3));
 			out.write(response);
 			charsetDecoder.reset();	
 		}
@@ -127,11 +128,23 @@ public class AsyncClientDecoderMachine extends DecodingStateMachine {
 				protected DecodingState finishDecode(IoBuffer product,
 						ProtocolDecoderOutput out) throws Exception {
 					out.write(product.getString(charsetDecoder));
-					return bodyState;
+					return sequenceState;
 				}
 			};
 		}
 	}; 
+	
+	
+	private DecodingState sequenceState = new IntegerDecodingState() {
+
+		@Override
+		protected DecodingState finishDecode(int value,
+				ProtocolDecoderOutput out) throws Exception {
+			out.write(value);
+			return bodyState;
+		}
+		
+	};
 	
 	private DecodingState bodyState = new IntegerDecodingState() {
 		
@@ -159,9 +172,11 @@ public class AsyncClientDecoderMachine extends DecodingStateMachine {
 				MutableHttpResponse response = (MutableHttpResponse)child;
 				String beanName = response.getHeader(Constants.HTTP_HEADER_BEANNAME);
 				String methodName = response.getHeader(Constants.HTTP_HEADER_METHOD);
+				String sequence = response.getHeader(Constants.HTTP_HEADER_SEQ);
 				IoBuffer content = response.getContent();
 				out.write(beanName);
 				out.write(methodName);
+				out.write(Integer.parseInt(sequence));
 				out.write(new IoBufferInputStream(content));
 			}
 			return null;

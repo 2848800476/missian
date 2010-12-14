@@ -60,6 +60,9 @@ public class AsyncClientHandler extends IoHandlerAdapter {
 		String methodName = response.getMethodName();
 		Callback callback = _factory.getCallBack(beanName, methodName);
 		if(callback == null) {
+			callback = _factory.getAndRemoveCallBack(response.getSequence());
+		}
+		if(callback == null) {
 			return;
 		}
 		InputStream is = response.getInputStream();

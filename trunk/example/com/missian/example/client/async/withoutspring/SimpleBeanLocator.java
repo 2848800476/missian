@@ -25,7 +25,7 @@
 package com.missian.example.client.async.withoutspring;
 
 import com.missian.common.beanlocate.BeanLocator;
-import com.missian.example.bean.HelloCallback;
+import com.missian.example.bean.client.HelloCallback;
 
 public class SimpleBeanLocator implements BeanLocator {
 

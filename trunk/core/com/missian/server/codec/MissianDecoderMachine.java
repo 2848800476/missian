@@ -52,17 +52,18 @@ public class MissianDecoderMachine extends DecodingStateMachine {
 	@Override
 	protected DecodingState finishDecode(List<Object> childProducts,
 			ProtocolDecoderOutput out) throws Exception {
-		if(childProducts.size()<4) {
+		if(childProducts.size()<5) {
 			return null;
 		}
 		TransportProtocol transport = (TransportProtocol)childProducts.get(0);
 		int childs = childProducts.size();
-		for(int i=1; i<childs; i=i+3) {
+		for(int i=1; i<childs; i=i+4) {
 			MissianRequest request = new MissianRequest();
 			request.setTransportProtocol(transport);
 			request.setAsync((Boolean)childProducts.get(i));
 			request.setBeanName((String)childProducts.get(i+1));
-			request.setInputStream((InputStream)childProducts.get(i+2));
+			request.setSequence((Integer)childProducts.get(i+2));
+			request.setInputStream((InputStream)childProducts.get(i+3));
 			out.write(request);
 			charsetDecoder.reset();
 		}
@@ -113,11 +114,22 @@ public class MissianDecoderMachine extends DecodingStateMachine {
 				protected DecodingState finishDecode(IoBuffer product,
 						ProtocolDecoderOutput out) throws Exception {
 					out.write(product.getString(charsetDecoder));
-					return bodyState;
+					return sequenceState;
 				}
 			};
 		}
 	}; 
+	
+	private DecodingState sequenceState = new IntegerDecodingState() {
+
+		@Override
+		protected DecodingState finishDecode(int value,
+				ProtocolDecoderOutput out) throws Exception {
+			out.write(value);
+			return bodyState;
+		}
+		
+	};
 	
 	private DecodingState bodyState = new IntegerDecodingState() {
 		
@@ -144,10 +156,16 @@ public class MissianDecoderMachine extends DecodingStateMachine {
 				ProtocolDecoderOutput out) throws Exception {
 			for(Object child : childProducts){
 				MutableHttpRequest request = (MutableHttpRequest)child;
-				String async = request.getHeader(Constants.HTTP_HEADER_ASYNC);
-				out.write(async!=null && async.equals("true"));//async-flag
+				String sequence = request.getHeader(Constants.HTTP_HEADER_SEQ);
+				if(sequence!=null) {
+					out.write(true);//async-flag
+				}
 				String beanName = request.getRequestUri().getPath().substring(1);
 				out.write(beanName);
+				if(sequence!=null) {
+					out.write(Integer.parseInt(sequence));
+				}
+				
 				out.write(new IoBufferInputStream(request.getContent()));
 			}
 			return null;
