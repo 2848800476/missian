@@ -40,8 +40,12 @@ public class SyncClientExample {
 //		config.setConnectTimeout(20);
 //		SyncMissianProxyFactory factory = new SyncMissianProxyFactory(new CommonSocketPool(config));
 		SyncMissianProxyFactory factory = new SyncMissianProxyFactory();
-		Hello hello = (Hello)factory.create(Hello.class, "tcp://localhost:1235/hello");
-		System.out.println(hello.hello("hy", 27));
+		Hello hello = (Hello)factory.create(Hello.class, "tcp://127.0.0.1:1235/hello");
+		long time = System.currentTimeMillis();
+		for(int i=0; i<200; i++) {
+			hello.hello("hy", 27);
+		}
+		System.out.println(System.currentTimeMillis() - time);
 	}
 
 }
