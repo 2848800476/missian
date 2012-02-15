@@ -287,10 +287,10 @@ public class SyncMissianProxy implements InvocationHandler, Serializable {
 			if(transportProtocol==TransportProtocol.tcp) {
 				
 				byte[] beanNameBytes = beanName.getBytes(Constants.BEAN_NAME_CHARSET);
-				byte[] headerBytes = new byte[beanNameBytes.length+9];
+				byte[] headerBytes = new byte[beanNameBytes.length+13];
 				System.arraycopy(intToByteArray(beanNameBytes.length), 0, headerBytes, 1, 4);
 				System.arraycopy(beanNameBytes, 0, headerBytes, 5, beanNameBytes.length);
-				System.arraycopy(intToByteArray(baos.size()), 0, headerBytes, 5+beanNameBytes.length, 4);
+				System.arraycopy(intToByteArray(baos.size()), 0, headerBytes, 9+beanNameBytes.length, 4);
 				
 				os.write(headerBytes);
 				baos.writeTo(os);
